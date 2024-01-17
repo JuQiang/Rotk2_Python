@@ -1,0 +1,1098 @@
+b82:619 #call c7c:50, clear screen
+b82:621 # clear boxes
+b82:67f #call 76a:3042
+b82:74a #call b82:4f2
+b82:74d #show logo
+#step into b82:74d
+b82:4f2 #clear screen, should change ip to 4f7 to ignore this call
+b82:519 # show logo, call 164
+	#stepinto b82:164
+	b82:18c #call 76a:3134
+		#stepinto 76a:3134
+		76a:3144 jmp cs:3505
+		#cs:3505
+		76a:350c call cs:12c
+		#76a:358b jmp 3593
+		#76a:3582 jmp 368d
+		#76a:36db jz 36fb
+		#76a:36fb or dl,dh
+		#cs:374d jz 3751
+		#cs:374f jmp 3718
+
+bp 525
+
+80 02 c8 00 7a f0 9f 9f 9f 9f 9f 9f 9f 9f 9f 97
+08 c0 50 00 02 10 08 80 b1 00 10 bf bf bf bf bf
+
+bp 54b: call 164
+18c: call far 2139:3134
+
+
+koei logo
+184: 
+push dx; 2551
+push ax; 012c
+push [word bp+8]; 0042
+push [word bp+6]; 00d8
+
+allrights logo
+
+184: 
+push dx; 2551
+push ax; 012c
+push [word bp+8]; 0088
+push [word bp+6]; 00e1
+
+
+
+
+
+city:19
+governer: haozhao 100
+general: no.4, haozhao 61
+food: 1234
+
+(100+61)/2=0x50
+g17d2:99
+
+sql(1234)=0x23
+
+(11+game diff 1)*sql(populcations 9036)=0x474
+
+0x50*0x23=0xaf0
+
+0/0474
+
+af0/474
+
+
+
+69 int
+29 gold
+
+
+
+低价：82
+a29=41
+a3b = 59
+
+59*100
+50+85=135
+
+5900/100=59
+
+89
+
+gd79:119
+
+8,6,4,1,0
+6,4,3,2,0
+
+
+153: 0001 0101 0011
+5d : 	  0101 1101
+34: 2,7
+36: 2,8
+39: 4,7
+40: 3,6
+
+gc21:364
+
+draw logo at open.exe
+
+g 76c:386a
+g b84:74a
+4f2 #clear screen, should change ip to 4f7 to ignore this call
+
+g 76c:3593, then start python debugging same time
+
+main3调试，画龙虎
+
+g76c:2e4e
+t
+g76c:2e4e
+g76c:2e5e
+t
+
+76c:321f~349a
+
+
+draw logo at open.exe
+
+g 76c:386a
+g b84:74a
+4f2 #clear screen, should change ip to 4f7 to ignore this call
+
+g 76c:3593, then start python debugging same time
+
+draw map at main.exe
+
+g76c:2e4e
+t
+g76c:2e4e
+g76c:2e5e
+
+3712:cb9a contains current pixel position
+
+t
+g321f
+g32ad
+
+u 76c:321f~349a
+
+910~960
+2910~2960
+
+961~9b0
+2960~296b bad
+
+debug rtk2.exe
+880:1c9 = 31, #bl=8
+880:104 = 3
+880:103 = 0
+880:1BE = 880, #ds addr
+880:1C2 = 880, #ds addr
+880:1C6 = 880, #ds addr
+880:1BC = 1C8, 
+
+debug open1.exe #已脱壳
+g31 #如果没脱壳
+gf6 #如果没脱壳
+g386a
+g619
+t
+e 1466 0
+e ss:2214 1 #c7e:5a
+g76c:31cf
+
+call 890:315时，set al=0e ;640*200 16 colors
+
+g890:3871
+
+debug main.exe 未脱壳
+g31,t
+gf6,t
+gc21:e9
+ecea2 0
+ess:e462 1
+g1361:514 ; g76c:c464
+rip 519
+g76c:2ee9
+
+rbx 0
+rcx di
+n lh.dat
+w
+
+
+
+# f606a2ce04 -> eb 3f
+
+s 176c:0 l ffff 9a e6 00 21 0c
+found:
+9b00
+9b85
+
+e176c:9b00 90 90 90 90 90
+
+9ae600210c -> 90 90 90 90 90
+
+search 276c/376c/476c
+
+index: ds:cb9a
+
+8，18，28，38，48，58，68，78，88，98，a0,a1,a2
+52,53,54,56,57,67,77,87,97,a7,b7,c7,d7,e3,e4,ea,eb,ec,f2
+a6,a7,a8,aa,ab,bb,cb,db,eb,fb,10b,11b,12b,137,138,13e,13f,140,145
+
+read opening.dat
+gb84:741
+74a:draw all
+t
+gb84:519
+
+ds:0
+be c9 41 08 27 ff 78 40 09 fc 11 04 39 fc 09 04
+09 fc 19 04 67 ff 00 10 7f ff 04 10 02 70 a4 de
+
+debug main.exe
+g31,t
+gf6,6
+g76c:4c54
+a104
+mov ax,e
+
+g e0f:462
+rip 467
+
+pos	size	real size	diff
+0: 280*c8	3e80
+37ae:128*c8	1ce8		
+62b2:158*c8
+6951:150*03
+696a:50*38
+6a18:80*40，结盟
+85f0:b0*48，来信（包括结盟、招降等）
+731f：80*40，武将过境
+
+8990:40*18,tianqing_qing
+8d2a:40*18,
+8f52:e0*c8,
+4713:696a 
+881f:40*18
+
+how to debug prior picture
+
+g76c:2e4e
+t
+d3712:cb9a, if not exist in "pos" column ,then run to 32ad , and log all registers
+
+or more simple
+gc21:1d7
+monitor ss:[bp+a]
+t
+
+
+g 76c:321f
+dcb9a
+t
+
+
+
+opening.dat
+
+draw logo at open.exe
+
+ec7e:fe cb
+
+
+g 76c:3505
+
+dee2:1198 to get position
+
+
+g76c:1514 to show picture after a long scrolled text
+
+cx=1c, dx=84,
+
+loop for 0x30 times
+	loop for 0x1c times
+		si=1->di=14a6
+		si=4->di=14a7
+
+	if di<2000:
+		di+=2000
+	else:
+		di -=2000
+		di += 0x50
+
+	di -=0x1c
+
+0x30行
+g3593 to get register
+g377d 离开，然后看显示文字的内容
+
+b84:1f2 mov ax,b4
+b84:1f5 push ax
+b84:201 call c02:760
+
+bx=bc
+cx=bu
+
+b84:201显示文字
+
+里面的c02:775显示每个汉字
+
+
+c02:636显示汉字，49a内再显示,4b9内根据内码查找对应的文字pixel位置
+
+dds:320，一共c28-320个，存到了hanzi_index中
+
+找到后，用该序号乘以30，结果+2，对应位置在msg.16p中。
+
+TODO：从hanzi——index中，把每个对应的码表记下来，用手工把汉字打上。
+
+
+gb84:3a2 before show scrolled text
+ds=1ee3
+b84:3c9显示滚动汉字
+
+opening.dat
+seek to offset: 0x4975,read 0x3de0 bytes，一共1b8行，折合每个36字节
+
+大小固定，存放的是汉字的图形buffer，不是按字显示，而是按照每行字的第一行/第二行/。。。第n行像素显示。
+
+每次传输0x12个bytes到显存中，
+di的变化为：3c18,3bf4,
+
+每行16个字
+
+
+
+
+
+
+
+
+
+
+
+
+
+command_level = 1
+command = []
+
+show_commands(command):
+	show_sub_commands(command)
+	show_prompt(command)
+
+	cmd = get_key()
+
+	if not enter:
+		command_level += 1
+		command.append(cmd)
+		show_commands(command)
+	else
+		command_level -= 1
+		command.remove(-1)
+		show_commands(command)
+
+pygame阻塞式接受键盘输入
+
+1，
+向何处迁移（1-41）？
+#显示武将列表
+让谁转移（1-3）？
+运走多少黄金（0-1000）？
+运走多少粮食（0-25000）？
+#如果是太守迁移，那么
+#显示武将列表
+刘备请决定第4郡太守（1-2）？
+#如果全部都迁移了，那么：
+放弃这个郡吗（Y/N）？
+
+2，
+运送到何地（1-41）？
+#显示武将列表
+派谁运送（1-2）？
+补给多少黄金（0-1000）？
+补给多少粮食（0-25000）？
+
+3，
+相邻敌国 3 7
+进攻何地？
+#显示武将列表
+派谁出兵（1-2）？
+#显示武将列表、目的地、统治诸侯、总兵力等
+带多少黄金（0-1000）？
+带多少粮食（0-25000）？（一个月990）
+进攻吗（Y/N）？
+
+4，
+1.募兵 2.派兵 3.练兵，请选择（1-3）？
+4.1
+#显示武将列表
+派谁募兵（1-2）？
+募兵几百人（1-90）？
+#如果没有满员
+剩余士兵数：3000，变更谁呢（1-2）？
+带多少士兵（0-4000）？
+剩余士兵数：1000，变更谁呢（1-2）？
+剩余士兵数：0，变更谁呢（1-2）？
+可以吗（Y/N）？
+3000人复原为居民可以吗（Y/N）？
+4.2
+#显示武将列表
+让谁重新分派（1-2）？
+重复4.1逻辑
+4.3
+#显示武将列表
+派谁练兵（1-2）？
+#如果有军师
+#展示军师的话
+开始训练吗（Y/N）？
+提高了训练水准
+
+5
+1.征召 2.找寻 3.指派 4.解职
+请选择（1-4）？
+
+5.1
+哪一郡的将领（1-41）？
+#如果是本郡，看是否有在野将领
+#如果是别郡
+显示武将列表（名字）
+征召（0-9）？（0:看下一页）
+显示武将头像
+华雄可以吗（Y/N）？
+#如果是Y
+1. 三顾之礼 2.良驹 3.黄金 4.书信
+请选择（1-4）？
+5.1.1
+派使者（Y/N）？
+吕布不愿应召
+5.1.2.
+显示武将列表
+派谁当差使？
+派使者（Y/N）？
+5.1.3.
+显示武将列表
+派谁当差使（1-2）？
+派使者（Y/N）？
+
+5.1.2
+5.2
+显示武将列表
+派谁找寻（1-1）？
+显示头像，可惜什么人也没找到
+
+8
+1.其他郡 2.将领 3.总结1 4.总结2 5.领地 6.资料顺序
+8.1
+哪一郡（1-41）？
+显示武将列表
+由谁侦查
+1.其他郡 2.将领 3.总结1 4.总结2 5.资料顺序，请选择（1-5）？
+
+8.2
+显示武将列表
+选谁（1-1）？
+显示信息
+接着键入
+
+8.6
+1.才智 2.战斗力 3.号召力 4.士兵数 5.忠诚度
+以哪一数据为标准（1-5）？
+
+debug maine.exe
+
+c21:4e8 begin draw province line <-> dseg:5038, s_5038
+gc21:4f8 call cae:1c2 <-> dseg 5048 call far ptr 542h:1c2h to loop drawing province 
+whieh means: c21:4f8<->dseg 5048, cae:1c2<->542:1c2
+cae:1c2 <-> dseg:55e2 
+cae:1c8 call c91:4a <-> dseg:55e8 call far ptr 525h:4ah <->dseg:529a
+
+c21:4fb <->dseg:52f4
+c91:4a <-> dseg:5280
+
+
+
+dseg:5038 juqiang_begin_draw_map_lines proc far   ; CODE XREF: s_4EB4+30↑p
+dseg:5038
+dseg:5038 var_6           = word ptr -6
+dseg:5038 var_2           = word ptr -2
+dseg:5038
+dseg:5038                 push    bp
+dseg:5039                 mov     bp, sp
+dseg:503B
+dseg:503B loc_1503B:                              ; CODE XREF: game_send_how_much_gold_food+A1↓j
+dseg:503B                                         ; game_send_how_much_gold_food+BB↓j
+dseg:503B                 sub     sp, 6
+dseg:503E                 mov     [bp+var_2], 2DC4h ; 1st province address
+dseg:5043                 mov     [bp+var_6], 29h ; ')' ; number of provinces
+dseg:5048
+dseg:5048 loc_15048:                              ; CODE XREF: juqiang_begin_draw_map_lines+30↓j
+dseg:5048                                         ; game_send_how_much_gold_food+CA↓j
+dseg:5048                 push    [bp+var_2]
+dseg:504B                 call    far ptr 542h:1C2h ; dseg 55e2
+dseg:5050
+dseg:5050 loc_15050:                              ; CODE XREF: dseg:24F59↓j
+dseg:5050                 add     sp, 2
+dseg:5053                 or      ax, ax
+dseg:5055
+dseg:5055 loc_15055:                              ; CODE XREF: dseg:25037↓p
+dseg:5055                                         ; dseg:250A6↓p
+dseg:5055                 jnz     short loc_15061
+dseg:5057                 push    [bp+var_2]
+dseg:505A                 push    cs
+dseg:505B                 call    near ptr s_4F44
+dseg:505E                 add     sp, 2
+dseg:5061
+dseg:5061 loc_15061:                              ; CODE XREF: juqiang_begin_draw_map_lines:loc_15055↑j
+dseg:5061                 add     [bp+var_2], 35	;province size
+dseg:5065                 dec     [bp+var_6]	; 41 provinces
+dseg:5068                 jnz     short loc_15048
+dseg:506A                 mov     sp, bp
+dseg:506C                 pop     bp
+dseg:506D                 retf
+dseg:506D juqiang_begin_draw_map_lines endp
+
+dseg:55E2 juqiang_is_province_have_ruler_by_province_address proc far
+dseg:55E2
+dseg:55E2 arg_0           = word ptr  6
+dseg:55E2
+dseg:55E2                 push    bp
+dseg:55E3                 mov     bp, sp
+dseg:55E5                 push    [bp+arg_0]
+dseg:55E8
+dseg:55E8 loc_155E8:                              ; CODE XREF: game_war_neighboring_provinces_query+D0↓j
+dseg:55E8                 call    far ptr 525h:4Ah ; game_data_get_province_rulers_potrait_data
+dseg:55ED                 cmp     ax, 1
+dseg:55F0                 sbb     ax, ax
+dseg:55F2                 neg     ax
+dseg:55F4                 mov     sp, bp
+dseg:55F6                 pop     bp
+dseg:55F7                 retf
+dseg:55F7 juqiang_is_province_have_ruler_by_province_address endp
+
+
+---> c21:3f4
+s_4F44          proc far                ; CODE XREF: s_5038+23↓p
+dseg:4F44
+dseg:4F44 var_10          = word ptr -10h
+dseg:4F44 var_E           = word ptr -0Eh
+dseg:4F44 var_C           = dword ptr -0Ch
+dseg:4F44 var_8           = dword ptr -8
+dseg:4F44 var_2           = word ptr -2
+dseg:4F44 arg_0           = word ptr  6
+dseg:4F44
+dseg:4F44                 push    bp
+dseg:4F45                 mov     bp, sp
+dseg:4F47                 sub     sp, 10h
+dseg:4F4A
+dseg:4F4A loc_14F4A:                              ; CODE XREF: game_send_result+81↓j
+dseg:4F4A                                         ; game_send_result+FA↓j ...
+dseg:4F4A                 test    byte ptr word_1CEA2, 1
+dseg:4F4F                 jnz     short loc_14F54
+dseg:4F51                 jmp     loc_14FD8
+dseg:4F54 ; ---------------------------------------------------------------------------
+dseg:4F54
+dseg:4F54 loc_14F54:                              ; CODE XREF: s_4F44+B↑j
+dseg:4F54                 push    [bp+arg_0]
+dseg:4F57                 call    far ptr 542h:1C2h; dseg 55e2,juqiang_is_province_have_ruler_by_province_address
+dseg:4F5C
+dseg:4F5C loc_14F5C:                              ; CODE XREF: dseg:24F57↓j
+dseg:4F5C                 add     sp, 2
+dseg:4F5F                 or      ax, ax
+dseg:4F61                 jz      short loc_14F68
+dseg:4F63                 mov     ax, 3B90h
+dseg:4F66
+dseg:4F66 loc_14F66:                              ; CODE XREF: game_send_result+10↓j
+dseg:4F66                                         ; dseg:24F60↓j
+dseg:4F66                 jmp     short loc_14F91
+dseg:4F68 ; ---------------------------------------------------------------------------
+dseg:4F68
+dseg:4F68 loc_14F68:                              ; CODE XREF: s_4F44+1D↑j
+dseg:4F68                                         ; dseg:24F64↓j
+dseg:4F68                 push    [bp+arg_0]
+dseg:4F6B                 call    far ptr 525h:4Ah;dseg 529a
+dseg:4F70
+dseg:4F70 loc_14F70:                              ; CODE XREF: game_send_result+13↓j
+dseg:4F70                 add     sp, 2
+dseg:4F73                 push    ax
+dseg:4F74
+dseg:4F74 loc_14F74:                              ; CODE XREF: game_send_pre_result+7↓p
+dseg:4F74                 call    far ptr 525h:6	; dseg 5256
+dseg:4F79                 add     sp, 2
+dseg:4F7C                 mov     bl, al
+dseg:4F7E                 sub     bh, bh
+dseg:4F80                 mov     al, [bx+48h]
+dseg:4F84
+dseg:4F84 loc_14F84:                              ; CODE XREF: dseg:24FE7↓j
+dseg:4F84                 sub     ah, ah
+dseg:4F86                 mov     cx, ax
+dseg:4F88                 shl     ax, 1
+dseg:4F8A                 add     ax, cx
+dseg:4F8C                 shl     ax, 1
+dseg:4F8E                 add     ax, 3B30h
+dseg:4F91
+dseg:4F91 loc_14F91:                              ; CODE XREF: s_4F44:loc_14F66↑j
+dseg:4F91                 mov     [bp+var_2], ax
+dseg:4F94
+dseg:4F94 loc_14F94:                              ; DATA XREF: game_start_new_ruler_enter_sex+F↓r
+dseg:4F94                 cmp     word_13570, 0
+dseg:4F99
+dseg:4F99 loc_14F99:                              ; DATA XREF: game_start_new_ruler_enter_sex+B↓r
+dseg:4F99                 jz      short loc_14FD0
+dseg:4F9B
+dseg:4F9B loc_14F9B:                              ; DATA XREF: dseg:loc_1C81B↓r
+dseg:4F9B                 mov     ax, word_1C9FC
+dseg:4F9E
+dseg:4F9E loc_14F9E:                              ; DATA XREF: dseg:C817↓r
+dseg:4F9E                                         ; dseg:C813↓r
+dseg:4F9E                 mov     word ptr [bp+var_8+2], ax
+dseg:4FA1                 mov     word ptr [bp+var_8], 0
+dseg:4FA6                 mov     word ptr [bp+var_C+2], ax
+dseg:4FA9                 mov     ax, 4000h
+dseg:4FAC                 mov     word ptr [bp+var_C], ax
+dseg:4FAF                 mov     [bp+var_10], ax
+dseg:4FB2
+dseg:4FB2 loc_14FB2:                              ; CODE XREF: s_4F44+83↓j
+dseg:4FB2                 les     bx, [bp+var_C]
+dseg:4FB5                 mov     al, es:[bx]
+dseg:4FB8                 les     bx, [bp+var_8]
+dseg:4FBB                 mov     es:[bx], al
+dseg:4FBE                 inc     word ptr [bp+var_C]
+dseg:4FC1                 inc     word ptr [bp+var_8]
+dseg:4FC4                 dec     [bp+var_10]
+dseg:4FC7                 jnz     short loc_14FB2
+dseg:4FC9
+dseg:4FC9 loc_14FC9:
+dseg:4FC9                 push    word_1C9FC
+dseg:4FCD                 jmp     short loc_14FD3
+dseg:4FCF ; ---------------------------------------------------------------------------
+dseg:4FCF                 nop
+dseg:4FD0
+dseg:4FD0 loc_14FD0:                              ; CODE XREF: s_4F44:loc_14F99↑j
+dseg:4FD0                 sub     ax, ax
+dseg:4FD2                 push    ax
+dseg:4FD3
+dseg:4FD3 loc_14FD3:                              ; CODE XREF: s_4F44+89↑j
+dseg:4FD3                 push    [bp+var_2]
+dseg:4FD6                 jmp     short loc_1501E
+dseg:4FD8 ; ---------------------------------------------------------------------------
+dseg:4FD8
+dseg:4FD8 loc_14FD8:                              ; CODE XREF: s_4F44+D↑j
+dseg:4FD8                 push    [bp+arg_0]
+dseg:4FDB                 call    far ptr 542h:1C2h; dseg 55e2
+dseg:4FE0                 add     sp, 2
+dseg:4FE3                 or      ax, ax
+dseg:4FE5                 jz      short loc_14FEC
+dseg:4FE7
+dseg:4FE7 loc_14FE7:                              ; CODE XREF: dseg:24F83↓j
+dseg:4FE7                 mov     ax, 3B90h
+dseg:4FEA                 jmp     short loc_15015
+dseg:4FEC ; ---------------------------------------------------------------------------
+dseg:4FEC
+dseg:4FEC loc_14FEC:                              ; CODE XREF: s_4F44+A1↑j
+dseg:4FEC                                         ; game_send_how_much_gold_food+6F↓j
+dseg:4FEC                 push    [bp+arg_0]
+dseg:4FEF                 call    far ptr 525h:4Ah; dseg 529a
+dseg:4FF4
+dseg:4FF4 loc_14FF4:                              ; CODE XREF: game_send_how_much_gold_food+22↓j
+dseg:4FF4                 add     sp, 2
+dseg:4FF7                 push    ax
+dseg:4FF8                 call    far ptr 525h:6	;dseg 5256
+dseg:4FFD                 add     sp, 2
+dseg:5000                 mov     bl, al
+dseg:5002                 sub     bh, bh
+dseg:5004                 mov     al, [bx+48h]
+dseg:5008                 sub     ah, ah
+dseg:500A                 mov     cx, ax
+dseg:500C                 shl     ax, 1
+dseg:500E
+dseg:500E loc_1500E:                              ; CODE XREF: game_send_how_much_gold_food+6D↓j
+dseg:500E                                         ; game_send_how_much_gold_food+74↓j ...
+dseg:500E                 add     ax, cx
+dseg:5010                 shl     ax, 1
+dseg:5012                 add     ax, 3AD0h
+dseg:5015
+dseg:5015 loc_15015:                              ; CODE XREF: s_4F44+A6↑j
+dseg:5015                 mov     [bp+var_E], ax
+dseg:5018                 sub     ax, ax
+dseg:501A                 push    ax
+dseg:501B                 push    [bp+var_E]
+dseg:501E
+dseg:501E loc_1501E:                              ; CODE XREF: s_4F44+92↑j
+dseg:501E                 mov     ax, 2
+dseg:5021                 push    ax
+dseg:5022                 sub     ax, ax
+dseg:5024                 push    ax
+dseg:5025                 mov     bx, [bp+arg_0]
+dseg:5028                 push    word ptr [bx+1Eh]
+dseg:502B                 push    word ptr [bx+1Ch]
+dseg:502E                 call    far ptr 0:5E6h
+dseg:5033                 mov     sp, bp
+dseg:5035
+dseg:5035 loc_15035:                              ; CODE XREF: game_send_how_much_gold_food+104↓j
+dseg:5035                 pop     bp
+dseg:5036                 retf
+dseg:5036 s_4F44          endp
+dseg:5036
+
+
+dseg:529A juqiang_get_ruler_address_by_province_address proc far
+dseg:529A
+dseg:529A arg_0           = word ptr  6
+dseg:529A
+dseg:529A                 push    bp
+dseg:529B                 mov     bp, sp
+dseg:529D                 mov     bx, [bp+arg_0]
+dseg:52A0                 cmp     byte ptr [bx+10h], 255
+dseg:52A4                 jnz     short loc_152AA
+dseg:52A6                 sub     ax, ax
+dseg:52A8                 pop     bp
+dseg:52A9                 retf
+dseg:52AA ; ---------------------------------------------------------------------------
+dseg:52AA
+dseg:52AA loc_152AA:                              ; CODE XREF: juqiang_get_ruler_address_by_province_address+A↑j
+dseg:52AA                                         ; dseg:2529D↓j
+dseg:52AA                 mov     al, 41
+dseg:52AC                 mul     byte ptr [bx+10h]
+dseg:52AF                 add     ax, 2B34h
+dseg:52B2                 pop     bp
+dseg:52B3                 retf
+dseg:52B3 juqiang_get_ruler_address_by_province_address endp
+
+dseg:5280
+dseg:5280 ; Attributes: bp-based frame
+dseg:5280
+dseg:5280 s_5280          proc far                ; CODE XREF: draw_provinces_map_lines↓p
+dseg:5280
+dseg:5280 arg_0           = word ptr  6
+dseg:5280
+dseg:5280                 push    bp
+dseg:5281                 mov     bp, sp
+dseg:5283                 mov     bx, [bp+arg_0]
+dseg:5286                 cmp     byte ptr [bx+0Ah], 0FFh
+dseg:528A                 jnz     short loc_15290
+dseg:528C
+dseg:528C loc_1528C:                              ; CODE XREF: game_war_send_whom_display_info+2C↓j
+dseg:528C                 sub     ax, ax
+dseg:528E                 pop     bp
+dseg:528F
+dseg:528F locret_1528F:                           ; CODE XREF: game_war_send_whom_display_info+1E↓j
+dseg:528F                 retf
+dseg:5290 ; ---------------------------------------------------------------------------
+dseg:5290
+dseg:5290 loc_15290:                              ; CODE XREF: s_5280+A↑j
+dseg:5290                 mov     al, 41
+dseg:5292                 mul     byte ptr [bx+0Ah]
+dseg:5295                 add     ax, 2B34h
+dseg:5298                 pop     bp
+dseg:5299                 retf
+dseg:5299 s_5280          endp
+
+dseg:5256 juqiang_get_ruler_no_by_ruler_address proc far
+dseg:5256
+dseg:5256 arg_0           = word ptr  6
+dseg:5256
+dseg:5256                 push    bp
+dseg:5257                 mov     bp, sp
+dseg:5259                 mov     ax, [bp+arg_0]
+dseg:525C                 sub     ax, 2B34h
+dseg:525F                 mov     cx, 41
+dseg:5262                 cwd
+dseg:5263                 idiv    cx
+dseg:5265                 pop     bp
+dseg:5266                 retf
+dseg:5266 juqiang_get_ruler_no_by_ruler_address endp
+
+76c:a6b
+
+76c:c07 start draw, dseg:c07
+data stored in maine.exe: 38f02, or main.exe 3df25
+
+944: push bx; bx=0x21
+945: shr bx,1
+
+width = 0xdd
+height = 0x43
+
+a2 = height>>1
+a = height>>2 (0x43->0x10)
+b = a<<2 (0x10->0x40)
+b += a	(0x40->0x50)
+b = b<<4(0x50->0x500)
+c=width(0xdd)
+c = c>>3(0xdd->0x1b)
+location = b+c=0x51b
+if a2 is jishu:
+	location += 0x2000
+
+9bc flash graphic
+9cb: call a6b
+
+a6b: nop
+a6c: push cs
+a6d: call 9df
+	9df: mov di,340b
+	9e2: jmp 9e7
+	9e7: mov si,[di+4];di=340b, ds:340f=e262;->si=e262
+	9ea: dec si, dec si;->si=e260
+	9ec: mov [si],bx;bx=251b->ds:e260 = 251b
+	9ee: dec si;si=e25f
+	9ef: mov [si],ch; cx=fc00;ds:e25f->fc
+	9f1: cmp si,[di];ds:340b=e1cc, si=e25f
+	ja 9f8
+	9f8: cmp si,[di+6];si=e25f, ds:[di+6]=e262
+	jz 9da
+	9fd: mov [di+4],si; ds:340f=e262, si=e25f->ds:340f=e25f
+	a00: retf
+a70: mov ch,0
+a74: call 9df
+	9df: mov di,340b
+	9e7: mov si,[di+4];di=340b, ds:340f=e25f;->si=e25f
+	9ea: dec si, dec si;->si=e25d
+	9ec: mov [si],bx;bx=251b->ds:e25d = 251b
+	9ee: dec si;si=e25f
+	9ef: mov [si],ch; cx=0000;ds:e25c->00
+	9f1: cmp si,[di];ds:340b=e1cc, si=e25c
+	ja 9f8
+	9f8: cmp si,[di+6];si=e25c, ds:[di+6]=e262
+	jz 9da
+	9fd: mov [di+4],si; ds:340f=e25f, si=e25c->ds:340f=e25c
+	a00: retf
+a77: nop
+a78: push cs
+a79: call 9e4
+	9e4: mov di,3413
+	9e7: mov si,[di+4];ds:[di+4]=e424->si=e424
+	9ec: mov [si],bx;bx=251b->ds:e424 = 251b
+	9ee: dec si;
+	9ef: mov [si],ch;ds:e421=0
+	9f1: cmp si,[di];ds:[3413]=e262, si=e421
+	9f3: ja 9f8
+	9f8: cmp si,[di+6];si=e421,ds:[3419]=e424
+	jz 9da
+	9fd: mov [di+4], si;si=e421->ds:3417=e421
+	a00: retf
+a7c: nop
+a7d: push cs
+a7e: call a01
+	a01: mov di,340b
+	a04: jmp a09
+	a09: mov si,[di+6];ds:[3411]=e262 ->si = e262
+	dec si,dec si;si->e260
+	a0e: mov bx,[si];ds:e260=251b->bx = 251b
+	dec si
+	a11: mov ch,[si];si = e25f, ds:[e25f]=fc -> ch = 0xfc
+	a13: cmp si,[di];si=e25f, ds:[340b]=e1cc
+	a15: ja a1a
+	a1a: mov [di+6],si; ds:[3411] = e25f
+	a1d: retf
+a81: or ch,ch;ch=0xfc
+a83: jnz a88
+a88: nop
+a89: push cs
+a8a: call c28
+	c28: mov si,[bp+10]; ss:[e4ea]=5a48(ES seg value)->si = 5a48
+	c2b: cmp si,0
+	c2e: jz c40
+	c30: mov es,si; ->es = original es 5a48
+	c32: es:mov al,[bx];bx=251b, es:[251b]=a7; ->al=0xa7
+	c35: mov si,b800
+	c38: mov es,si
+	c3a: es: and [bx],al; es:[251b]=c6, al = a7 from offset 251b;
+	c3d: jmp c48
+	c48: not al; al=a7->al=0x58
+	c4a: retf
+a8d: mov cl,al;->cl=0x58; cx=fc58
+a8f: and al,ch; -> al = 58
+a91: jz a9d
+a93: shl ch,1;ch=fc->ch=f8
+a95: not ch; ->ch=07
+a97: test al,ch; 
+a99: jnz a7c
+a9b: jmp ab0
+ab0: xor ch,ch; al is 0x58 
+ab2: rcr al,1; al->0x2c
+ab4: jb abb
+ab6: stc
+ab7: rcl ch,1; ->ch=0x01
+ab9: jmp ab2
+;in the loops, al=16,ch=03;al=0b,ch=07;al=05,in ab4 CY set, so jmp to abb
+abb: or ch,ch; 
+abd: jnz ac9
+ac9: nop
+aca: push cs
+acb: call 9e4
+ace: mov al,cl;cx=0758 now->al = 58
+ad0: mov cl,03; ->cx = 0703
+
+ad2: and al,ch; ->al=0
+ad4: jz af6; true
+af6: mov al,ch; al=07
+af8: xchg di,bx; bx=251b, di=3413;
+afa: cmp word ptr[bp+10],+00; ss:[e43a]=0x5a48
+afe: jnz b08
+b08: nop
+b09: push cs
+b0a: call c4b
+	c4b: push ds;3712
+	c4c: push dx;9090
+	c4d: push ax;0007
+	c4e: mov dh,al;->dh=0
+	c50: not al; ->al = 0xf8
+	c52: mov dl,al; ->dl=0xf8
+	c54: mov ax,[bp+10]; ds:[e43a]=5a48
+	c57: mov ds,ax; ->ds = 5a48
+	c59: and [di],dl;ds:251b=a7, dl=f8 -> ds:251b=a0
+	c5b: pop ax,pop dx,pop ds, retf
+b0d: xchg di,bx; -> bx=251b, di=3413
+b0f: cmp bx,2000
+b13: jnb b1e
+b1e: sub bx,2000
+b22: mov dh,ch; dx=0703 ->dh=07
+b24: not dh; ->dh=0xf8
+b26: cmp bx,1fb0; bx=51b
+b2a: jb b32
+b32: nop
+b33: push cs
+b34: call a38
+	a38: nop
+	a39: push cs
+	a3a: call c28; 1st time is 251b, this time is 51b to b800:51b
+	a3d: or al,dh; al=af, dx=f890-> al=ff
+	a3f: cmp al,ff
+	a41: jz a67
+	a67: or cl,01; cx=0703 -> cl=3
+	a6a: retf
+b37: add bx,50; bx=51b ->bx=56b
+b3a: cmp bx,1f40
+b3e: jb b46
+b46: ror cl,1; cx=0703 -> cx=0781
+b48: nop
+b49: push cs
+b4a: call a38
+b4d: rol cl,1; cx=fc80; ->cx=fc01
+b4f: cmp bx,2000; bx=56b
+b53: jnb b5e
+b55: sub bx,50; ->bx=51b
+b58: add bx,2000
+b5c: jmp b62
+b5e: sub bx,2000
+b62: mov ch, dh; dx=f890 -> ch=f8
+b64: not ch; ->ch=07
+b66: test ch, 01
+b69: jnz b6e
+b6e: inc bx; bx=251b -> bx=251c
+b6f: nop
+b70: push cs
+b71: call a1e
+	a1e: test bx,0f; bx=251c
+	a22: jz a25
+	a24: retf
+b74: jnz b79; true
+b76: jmp ae7
+b79: mov dh,ch	; cx=0701 -> dh=07
+b7b: mov ch,ff
+b7d: nop
+b7e: push cs
+b7f: call c28
+b82: jmp ad2
+
+===================
+draw province lines:
+gc21:4de
+
+
+
+分配：3fb6个blocks
+
+u1755:6a4
+dseg:10534
+
+68
+
+save:
+save ds:3538 for 10 bytes
+save ds:42 for 0x33af bytes, this is the scenario length.
+save 552a:0 for 0x18fc bytes, this is the top 18fc bytes from hexdata.dat
+save 0x2ac3 0 bytes, unknown.
+
+
+g1201:f27
+
+test:
+scenario 1, ruler 4, 12, 11
+
+Some findings for memory 3360~336F. (In the game saved data, address is 0x3328~0x3337)
+
+When I start a new game , I selected YuanShao(ruler 4), Customized Ruler(ruler 12) and TaoQian(ruler 11).
+
+After all information collected, dseg:A9A8(game_start_new_game_setup_player_rulers) will do something.
+
+memory address 0x4CE8~0x4CED contains max rulers number in the 6 scenarios: 0c 0c 09 0b 05 05. Which means we can select up to 12 rulers to play in scenario 1 , up to 11 rulers to play in scenario 4, up to 5 players in scenario 6.
+
+0x4CEE: current scenario sequence, started from 1 instead of 0. The value is 1 because I chose scenario 1.
+0x4CEF: how many human controlled players. The value is 3 because I chose 3 players.
+
+0x4CF2~0x4CFD: stores up to 12 rulers sequence, the sequence started from 1 instead of 0. Because I chose ruler 4,12 and 11, so the value is 0x4CF2: 0x04, 0x4CF3: 0x0C, 0x4CF4: 0x0B.
+
+The memory address 0x3360~336F contains every ruler played sequence in the game. The initialized values is
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+
+The first ruler played sequence stored in [0x3360], second ruler played sequence stored in [0x3361], and so on. 
+
+So, the 1st player YuanShao(ruler 4), offset is 4(relative to 0x3360), sequence is 1, then memory layout changed to
+0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0.
+
+The 2nd player customized ruler(ruler 12), offset is 0x0F(relative to 0x3360), sequence is 2, then  memory layout changed to
+0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,2.
+
+The 3rd player TaoQian(ruler 11), offset is 11(relative to 0x3360), sequence is 3, then  memory layout changed to
+0,0,0,1,0,0,0,0,0,0,3,0,0,0,0,2.
+
+memory address 0x3380~0x33A0 contains up to 16 rulers offset.
+The order is played sequence. ruler from 1 to 16
+
+9b 2d: ruler 16(customized)
+49 2d: ruler 14
+a5 2c: ruler 10
+20 2d: ruler 13
+01 2c: ruler 6
+5d 2b: ruler 2
+72 2d: ruler 15
+f7 2c: ruler 12
+ce 2c: ruler 11
+d8 2b: ruler 5
+8b 2b: ruler 3
+34 2b: ruler 1
+53 2c: ruler 8
+2a 2c: ruler 7
+af 2b: ruler 4
+7c 2c: ruler 9
+
+the 3370 orders:
+
+rulers: 0a~0b, contains all of 16 rulers alliance information.
+rulers: 0c
+magic = 0
+iterate ruler's every province:
+	a=int(troops/100), b=(num of officers)*10
+	magic = a+b
+
+3370
+34 2b 5d 2b 86 2b af 2b 9b 2d
+
+ruler 2b34: 7ee
+ruler 2b5d: 4f6
+ruler 2b86: 50a
+ruler 2baf: fa
+ruler 2d9b: 6e
+
+order by magic asc
+
+yili/rende/yewang: dseg:c190
+
+
+main.exe
+820c l 1c contains 0~0d provinces name information
+
+ca 7e 0c 7f 48 7f 81 7f c3 7f fd 7f 37 80 7c 80 ba 80 e8 80 1b 81 5b 81 93 81 d7 81
+
+7eca~820a
+b9 94 83 94
+
+bp-2: x
+bp-6: y
+bp-4: 
+
+
+1st ruler stored in :5138h, [5144]=1
+
+1e6ab
+
+1dd1:40f
+
+new_game_select_scenario function:
+scenario.dat: 33af, stored at self ds:42
+hexdata.dat: 18fc, stored at 61e7:0
+
+v_b9ec: 2ac3 bytes
+
+512e: max number of rulers for 6 scenarios
+5134: scenario no
+5135: number of rulers
+
+game start
+not in 10e6:4e8
+
+offset
+0xab50:always ff ff
+0xab52:ds value, such as :0x58 0x3b
+0xab56: sp -2
+0xab5c: sp
+0xab5a: sp
+0xab4c: sp

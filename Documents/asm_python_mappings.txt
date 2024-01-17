@@ -1,0 +1,6 @@
+ds:0x58 : start of game data. 1st general. Prior to save data, 1st general is located at 0x20.
+So current province 339a in game data, means in 339a-58+20 -->3362
+0:378 ;juqiang_draw_shape_to_video_buffer
+3EFh:9B2h ; game_input_query_display_and_query
+4B5h:290h ; game_gfx_buffer_main_data_window
+0C49h:46Ch ; looks like display something

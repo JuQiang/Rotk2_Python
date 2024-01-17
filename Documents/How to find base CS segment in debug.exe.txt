@@ -1,0 +1,12 @@
+how to get SEG1 value
+
+Run debug main.exe in dosbox
+input: g31
+input: t
+input: gf6
+input: t
+input: u
+
+The below assmebly code contains the SEG1 value : 076C
+076C:34CC B430    MOV AH,30
+076C:34CE CD21    INT 21

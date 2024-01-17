@@ -1,0 +1,5 @@
+For location information, if a line starts with loc_ and looks like loc_****, then
+    **** - 0x8940 is the CS:IP in dos debug.exe.
+
+For func information, if a line starts with s_ and looks like s_**** proc near or s_**** proc far, then
+    **** + 0x76C0 is the CS:IP in dos debug.exe.

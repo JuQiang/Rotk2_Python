@@ -7,6 +7,12 @@ from collections.abc import Mapping, Sequence
 import random
 
 
+class ColorText(object):
+    text: str
+    back_color: int = 0
+    fore_color: int = 7
+
+
 class Helper(object):
     Scale = 1.0
 
@@ -158,7 +164,7 @@ class Helper(object):
     @staticmethod
     def SetProvinceGovernor(province_no, governor_offset):
         p = RoTK2.GetProvinceBySequence(province_no)
-        p.Governor = governor_offset
+        p.GovernorOffset = governor_offset
 
         new_list = []
         for o in p.OfficerList:
@@ -202,7 +208,7 @@ class Helper(object):
 
             # ensure all of the officers can be visited from this province
             # and, we MUST announce a new governor at 8.1 action
-            _from.Governor = from_list[0].Offset
+            _from.GovernorOffset = from_list[0].Offset
             RoTK2.FlushProvince(_from)
 
         i = -1
@@ -215,7 +221,7 @@ class Helper(object):
 
             # ensure all of the officers can be visited from this province
             # and, we MUST announce a new governor at 8.1 action
-            _to.Governor = to_list[0].Offset
+            _to.GovernorOffset = to_list[0].Offset
             RoTK2.FlushProvince(_to)
 
     @staticmethod
@@ -401,10 +407,14 @@ class Helper(object):
             b = Data.DSBUF[offset]
             if b == 0:
                 return ''.join(buf)
+            elif b == 0x01:
+                buf.append("@")
+                offset += 1
             elif b == 0x0a:
                 buf.append("_")
                 offset += 1
             elif b == 0x1b:
+                buf.append("@")
                 offset += 1
             elif b < 0x20:
                 buf.append(".")
@@ -451,7 +461,8 @@ class Helper(object):
         pygame.display.flip()
 
     @staticmethod
-    def GetOfficerList(officer_list, show_flag: ShowOfficerFlag, page, multi_select, officer_status, can_action=True):
+    def GetOfficerList(officer_list, show_flag: ShowOfficerFlag, page, multi_select, officer_status, can_action=True,
+                       enemy_province=False):
         bmp = pygame.Surface((330, 150))
         bmp.fill((0, 0, 0))
 
@@ -493,7 +504,7 @@ class Helper(object):
                 seq = Helper.DrawText("{0}.".format(i + 1))
 
             palette_no = 7
-            if can_action is True and RoTK2.CanOfficerDoAction(officer_list[i]) is False:
+            if can_action is True and RoTK2.CanOfficerDoAction(officer_list[i]) is False and enemy_province is False:
                 palette_no = 2
             name = Helper.DrawText(RoTK2.GetOfficerName(officer_list[i].Offset), palette_no=palette_no)
             mappings = {ShowOfficerFlag.Empty: 0, ShowOfficerFlag.Int: officer_list[i].Int,
@@ -519,7 +530,7 @@ class Helper(object):
 
     @staticmethod
     def GetCurrentRulerNo():
-        current_ruler_province = Data.BUF[0x339B] * 256 + Data.BUF[0x339A]
+        current_ruler_province = Helper.GetWordFromOffset(Data.BUF, Data.CURRENT_PROVINCE_OFFSET)
         return Data.BUF[current_ruler_province + 0x10]
 
     @staticmethod
@@ -1279,9 +1290,13 @@ class Helper(object):
 
     @staticmethod
     def SelectOfficer(province_no, prompt, show_flag: ShowOfficerFlag, multi_select=False, check_can_action=True,
-                      show_ruler=True, row=0, clear_area=True):
-        officer_list = RoTK2.GetProvinceBySequence(province_no).OfficerList
-        if show_ruler is False:
+                      show_governor=True, row=0, clear_area=True, offical=True, enemy_province=False):
+        if offical is True:
+            officer_list = RoTK2.GetProvinceBySequence(province_no).OfficerList
+        else:
+            officer_list = RoTK2.GetProvinceBySequence(province_no).UnclaimedOfficerList
+
+        if show_governor is False:
             officer_list = officer_list[1:]
 
         page = 0
@@ -1292,7 +1307,8 @@ class Helper(object):
             if clear_area is True:
                 Helper.ClearInputArea()
             bmp, have_more_pages, officer_status = Helper.GetOfficerList(officer_list, show_flag, page, multi_select,
-                                                                         officer_status, check_can_action)
+                                                                         officer_status, check_can_action,
+                                                                         enemy_province)
             Helper.Screen.blit(bmp, (300 * Helper.Scale, 130 * Helper.Scale))
 
             if only_one_page:
@@ -1321,7 +1337,7 @@ class Helper(object):
             for i in range(0, len(officer_status)):
                 if officer_status[i] is True:
                     ret = i + 1
-                    if show_ruler is False:
+                    if show_governor is False:
                         ret += 1
                     break
             return ret
@@ -1329,12 +1345,20 @@ class Helper(object):
             ret = []
             for i in range(0, len(officer_status)):
                 if officer_status[i] is True:
-                    if show_ruler is False:
+                    if show_governor is False:
                         ret.append(i + 1)
                     else:
                         ret.append(i + 2)
 
             return ret
+
+    @staticmethod
+    def ComapreValueWithRandom100(value):
+        num = random.randint(0, 100)
+        if value >= num:
+            return 1
+        else:
+            return 0
 
     @staticmethod
     def DisplayProvinces(ruler_no, page):
@@ -1391,7 +1415,7 @@ class Helper(object):
             if province.DelegateControl != "":
                 palette_no = 5
             body.blit(Helper.DrawText(str(province.No)), (x_list[0], height + 2))
-            governor_name_data = RoTK2.GetOfficerName(province.Governor)
+            governor_name_data = RoTK2.GetOfficerName(province.GovernorOffset)
             governor_name = Helper.DrawText(governor_name_data, palette_no=palette_no)
             body.blit(governor_name, (x_list[1] + (x_list[2] - x_list[1] - governor_name.get_width()) / 2, height + 2))
             huangjin = Helper.DrawText(str(province.Gold), scaled=False, palette_no=palette_no)
@@ -1470,7 +1494,7 @@ class Helper(object):
         while True:
             next = Helper.GetWordFromOffset(Data.BUF, current)
             if next == 0:
-                Helper.SetWordToOffset(Data.BUF, offset, next)
+                Helper.SetWordToOffset(Data.BUF, offset, current)
                 return
 
             current = next
@@ -1501,3 +1525,49 @@ class Helper(object):
                 return
 
             current = next
+
+    @staticmethod
+    def GetColorTextInformation(text):
+        items = text.split("@")
+
+        text_list = []
+
+        index = len(items) - 1
+        while True:
+            if index == -1:
+                ct = ColorText()
+                ct.text = items[index + 1]
+
+                text_list.append(ct)
+                break
+
+            if items[index].strip().startswith("C"):
+                ct = ColorText()
+                ct.text = items[index + 1]
+                ct.fore_color = items[index].strip()[1:]
+
+                text_list.append(ct)
+
+                items.pop()
+                items.pop()
+            index -= 1
+
+        text_list.reverse()
+
+        return text_list
+
+    @staticmethod
+    def RenderColorText(text_list, x, y):
+        x2 = x
+
+        for ct in text_list:
+            img = Helper.DrawText(ct.text, back_color=Helper.Palettes[int(ct.back_color)], palette_no=int(ct.fore_color))
+            img = pygame.transform.scale(img, (img.get_width() * Helper.Scale, img.get_height() * Helper.Scale))
+
+            Helper.Screen.blit(img, (x2, y))
+            x2 += img.get_width()
+
+        pygame.display.flip()
+
+        img_width = int((x2 - x) / Helper.Scale)
+        return img_width + 3

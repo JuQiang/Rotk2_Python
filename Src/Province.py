@@ -8,7 +8,7 @@ class Province(object):
     NextProvince = 0
     RulerNo  = 0
     WarRulerNo = 0
-    Governor = 0
+    GovernorOffset = 0
     FirstUnClaimedOfficerOffset = 0
     UnClaimedOfficerNumber = 0
     ClaimedOfficerNumber = 0

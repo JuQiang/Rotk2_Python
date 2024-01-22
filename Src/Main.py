@@ -108,7 +108,7 @@ class KeyboardDrivenFramework(object):
 
         while True:
             cmd = Helper.GetBuiltinText(0x5CEB).replace("%d-%d","1-41").replace("%d", str(Helper.CurrentProvinceNo))
-            gov_off = RoTK2.GetProvinceBySequence(Helper.CurrentProvinceNo).Governor
+            gov_off = RoTK2.GetProvinceBySequence(Helper.CurrentProvinceNo).GovernorOffset
             prompt = cmd.replace("%s", RoTK2.GetOfficerName(gov_off))
 
             self.switch_map_command()

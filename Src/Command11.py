@@ -23,7 +23,7 @@ class Command11(object):
         if award == -1:
             return
 
-        governor_offset = RoTK2.GetProvinceBySequence(province_no).Governor
+        governor_offset = RoTK2.GetProvinceBySequence(province_no).GovernorOffset
         if governor_offset==RoTK2.GetCurrentRulerOfficerOffset():
             show_ruler = False
         else:
@@ -32,7 +32,7 @@ class Command11(object):
 
         if award==1:
             whos = Helper.SelectOfficer(province_no, Helper.GetBuiltinText(0x7C00), ShowOfficerFlag.Loyalty,
-                                        check_can_action=False,show_ruler=show_ruler)
+                                        check_can_action=False, show_governor=show_ruler)
             if whos>0:
                 Helper.ClearInputArea()
                 gold = Helper.GetInput(Helper.GetBuiltinText(0x7C09)+"(1-100)? ",required_number_min=1,required_number_max=100)
@@ -45,7 +45,8 @@ class Command11(object):
                 Helper.ShowDelayedText(Helper.GetBuiltinText(0x7C55))
                 return
 
-            whos = Helper.SelectOfficer(province_no, Helper.GetBuiltinText(0x7BEE), ShowOfficerFlag.Loyalty, check_can_action=False,show_ruler=show_ruler)
+            whos = Helper.SelectOfficer(province_no, Helper.GetBuiltinText(0x7BEE), ShowOfficerFlag.Loyalty, check_can_action=False,
+                                        show_governor=show_ruler)
             if whos>0:
                 officer_offset = RoTK2.GetProvinceBySequence(province_no).GetOfficerBySequence(whos).Offset
                 result = self.Reward(officer_offset,governor_chm, 100)
@@ -55,7 +56,8 @@ class Command11(object):
                 Helper.ShowDelayedText(Helper.GetBuiltinText(0x7C63))
                 return
 
-            whos = Helper.SelectOfficer(province_no, Helper.GetBuiltinText(0x7B94), ShowOfficerFlag.Int, check_can_action=False,show_ruler=show_ruler)
+            whos = Helper.SelectOfficer(province_no, Helper.GetBuiltinText(0x7B94), ShowOfficerFlag.Int, check_can_action=False,
+                                        show_governor=show_ruler)
             if whos>0:
                 Helper.ClearInputArea()
                 yn = Helper.GetInput(Helper.GetBuiltinText(0x7B9B)+"(Y/N)? ",yesno=True)

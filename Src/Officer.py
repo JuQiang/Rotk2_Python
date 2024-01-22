@@ -19,7 +19,7 @@ class Officer(object):
     yewang= 0
     SpyBlongedToRuler= 0
     SpyInCityNo= 0
-    xiangxing= 0
+    Compatibility= 0
     WillDieInNextYear= 0
     CanMoveNow= 0
     MonthCannotMove= 0

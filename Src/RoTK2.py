@@ -46,7 +46,7 @@ class RoTK2(object):
             zhanzhengjun = city_data[0x14]
             yunshujun = city_data[0x15]
 
-            p.Governor = (city_data[0x03]<<8)+city_data[0x02]
+            p.GovernorOffset = (city_data[0x03] << 8) + city_data[0x02]
             p.FirstUnClaimedOfficerOffset = (city_data[0x05] << 8) + city_data[0x04]
             p.FreeOfficerOffset = (city_data[0x07] << 8) + city_data[0x06]
 
@@ -212,8 +212,8 @@ class RoTK2(object):
             Data.BUF[off + 0x10] = p.RulerNo
             Data.BUF[off + 0x11] = p.WarRulerNo
 
-            Data.BUF[off + 0x02] = (p.Governor+0x38) % 256
-            Data.BUF[off + 0x03] = (p.Governor+0x38) >>8
+            Data.BUF[off + 0x02] = (p.GovernorOffset + 0x38) % 256
+            Data.BUF[off + 0x03] = (p.GovernorOffset + 0x38) >> 8
             Data.BUF[off + 0x08] = p.Gold%256
             Data.BUF[off + 0x09] = p.Gold>>8
             Data.BUF[off + 0x0A] = p.Food % 256
@@ -295,15 +295,15 @@ class RoTK2(object):
         Data.BUF[officer.Offset + 0x0D] = officer.SpyBlongedToRuler
 
         Data.BUF[officer.Offset + 0x0E] = officer.SpyInCityNo
-        Data.BUF[officer.Offset + 0x0F] = officer.xiangxing
+        Data.BUF[officer.Offset + 0x0F] = officer.Compatibility
 
         Data.OfficerList = RoTK2.GetOfficerList()
 
     def FlushProvince(province:Province):
         Data.BUF[province.Offset + 0x00] = province.NextProvince % 256
         Data.BUF[province.Offset + 0x01] = province.NextProvince >> 8
-        Data.BUF[province.Offset + 0x02] = province.Governor % 256
-        Data.BUF[province.Offset + 0x03] = province.Governor >> 8
+        Data.BUF[province.Offset + 0x02] = province.GovernorOffset % 256
+        Data.BUF[province.Offset + 0x03] = province.GovernorOffset >> 8
         Data.BUF[province.Offset + 0x04] = province.FirstUnClaimedOfficerOffset % 256
         Data.BUF[province.Offset + 0x05] = province.FirstUnClaimedOfficerOffset >> 8
         Data.BUF[province.Offset + 0x06] = province.FreeOfficerOffset % 256
@@ -561,7 +561,7 @@ class RoTK2(object):
         o.shiwei = buffer[0x0C]
         o.SpyBlongedToRuler = buffer[0x0D]
         o.SpyInCityNo = buffer[0x0E]
-        o.xiangxing = buffer[0x0F]
+        o.Compatibility = buffer[0x0F]
 
         o.xueyuan = (buffer[0x11] << 8) + buffer[0x10]
         o.Soldiers = (buffer[0x13] << 8) + buffer[0x12]
@@ -676,7 +676,7 @@ class RoTK2(object):
             RoTK2.SaveData[o.Offset + 0x0D] = o.SpyBlongedToRuler
 
             RoTK2.SaveData[o.Offset + 0x0E] = o.SpyInCityNo
-            RoTK2.SaveData[o.Offset + 0x0F] = o.xiangxing
+            RoTK2.SaveData[o.Offset + 0x0F] = o.Compatibility
 
 
     @staticmethod
@@ -748,7 +748,7 @@ class RoTK2(object):
 
     @staticmethod
     def GetCurrentRulerName():
-        return RoTK2.GetOfficerByOffset((Data.BUF[RoTK2.CURRENT_RULER_OFFICER_OFFSET+1]<<8)+Data.BUF[RoTK2.CURRENT_RULER_OFFICER_OFFSET]-0x38).Name
+        return RoTK2.GetOfficerByOffset(RoTK2.GetCurrentRulerOfficerOffset().Offset)
 
     @staticmethod
     def GetCurrentRulerOfficerOffset():

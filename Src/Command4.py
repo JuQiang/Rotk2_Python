@@ -91,6 +91,8 @@ class Command4(object):
             return
 
         officer_no = Helper.SelectOfficer(self.province_no,Helper.GetBuiltinText(0x6BA0),ShowOfficerFlag.War)
+        if officer_no<1:
+            return
 
         officer = self.province.GetOfficerBySequence(officer_no)
 

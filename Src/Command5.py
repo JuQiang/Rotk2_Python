@@ -550,23 +550,46 @@ class Command5(object):
             Helper.SetWordToOffset(Data.BUF, officer.Offset,province.Offset + 2)
             Helper.ShowDelayedText(RoTK2.GetOfficerName(officer.Offset)+Helper.GetBuiltinText(0x6DE4,0x6DE7)+Helper.GetBuiltinText(0x6DD0))
 
+    def CanAssignAdvisor(self,province_no):
+        can_assign_advisor = True
+        if province_no < 1:
+            can_assign_advisor = False
+
+        if Helper.Is2ProvincesAreSameRuler(self.province_no, province_no) is False:
+            can_assign_advisor = False
+
+        province = RoTK2.GetProvinceBySequence(province_no)
+        if province.WarRulerNo != 0xFF:
+            can_assign_advisor = False
+
+        return can_assign_advisor
     def AssignAdvisor(self):
-        self.RenderColorText(0x6E3D)
+        Helper.ClearInputArea()
+
+        advisor = RoTK2.GetAdvisor()
+        if advisor is None:
+            img = Helper.DrawText(Helper.GetBuiltinText(0x6E55),scaled=True)
+            img = pygame.transform.scale(img,(img.get_width()*Helper.Scale,img.get_height()*Helper.Scale))
+            Helper.Screen.blit(img, (300*Helper.Scale, 300*Helper.Scale))
+            pygame.display.flip()
+        else:
+            text = Helper.GetBuiltinText(0x6E3D).replace("%s",RoTK2.GetOfficerName(advisor.Offset))
+            text_list = Helper.GetColorTextInformation(text)
+            Helper.RenderColorText(text_list,300*Helper.Scale,300*Helper.Scale)
+
         while True:
-            Helper.ClearInputArea()
-            text = Helper.GetBuiltinText(0x6E3D)
-            province_no = Helper.GetInput(Helper.GetBuiltinText(0x6D5C) + "(1-41)? ", required_number_min=1,
-                                          required_number_max=41, allow_enter_exit=True)
+            province_no = Helper.GetInput(Helper.GetBuiltinText(0x6E67) + "(1-41)? ", required_number_min=1,
+                                          required_number_max=41, allow_enter_exit=True,row=1)
 
             if province_no == -1:
-                break
+                return
 
-            if self.CanAssignGovernor(province_no) is False:
+            if self.CanAssignAdvisor(province_no) is False:
                 continue
 
             province = RoTK2.GetProvinceBySequence(province_no)
             while True:
-                officer_no = Helper.SelectOfficer(province_no, Helper.GetBuiltinText(0x6D9A), ShowOfficerFlag.Loyalty,check_can_action=False)
+                officer_no = Helper.SelectOfficer(province_no, Helper.GetBuiltinText(0x6DA7), ShowOfficerFlag.Int,check_can_action=False)
                 if officer_no >= 0:
                     break
 
@@ -574,12 +597,16 @@ class Command5(object):
                 continue
 
             officer = province.OfficerList[officer_no - 1]
-            province.OfficerList.pop(officer_no-1)
+            if officer.Int<80:
+                Helper.ShowDelayedText(Helper.GetBuiltinText(0x6DB4))
+                return
 
-            Helper.SetWordToOffset(Data.BUF,province.OfficerList[0].Offset,officer.Offset)
-            for i in range(0,len(province.OfficerList)-1):
-                Helper.SetWordToOffset(Data.BUF, province.OfficerList[i+1].Offset, province.OfficerList[i].Offset)
-            Helper.SetWordToOffset(Data.BUF, 0, province.OfficerList[i+1].Offset)
+            RoTK2.SetAdvisor(officer)
+            text = Helper.GetBuiltinText(0x6DDA,0x6DE7).replace("%s",RoTK2.GetOfficerName(officer.Offset))+Helper.GetBuiltinText(0x6DD5)
+            text_list = Helper.GetColorTextInformation(text)
+            Helper.RenderColorText(text_list,300*Helper.Scale,330*Helper.Scale)
+            pygame.time.wait(1000)
 
-            Helper.SetWordToOffset(Data.BUF, officer.Offset,province.Offset + 2)
-            Helper.ShowDelayedText(RoTK2.GetOfficerName(officer.Offset)+Helper.GetBuiltinText(0x6DE4,0x6DE7)+Helper.GetBuiltinText(0x6DD0))
+            Helper.ShowMap(self.province_no)
+
+            return

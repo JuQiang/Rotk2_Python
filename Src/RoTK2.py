@@ -2,11 +2,10 @@ from collections.abc import Mapping, Sequence
 from Province import Province
 from Officer import Officer
 from Ruler import Ruler
-from Data import Data,ShowOfficerFlag,DelegateMode
+from Data import Data, ShowOfficerFlag, DelegateMode
+
 
 class RoTK2(object):
-
-
     ProvinceList = Sequence[Province]
 
     @staticmethod
@@ -16,12 +15,14 @@ class RoTK2(object):
 
         Data.GAME_DIFFCULTY = int(Data.BUF[Data.GAME_DIFFCULTY_OFFSET])
         Data.NUMBER_OF_RULERS = int(Data.BUF[Data.NUMBER_OF_RULERS_OFFSET])
+
     @staticmethod
-    def GetProvinceList()->Sequence[Province]:
+    def GetProvinceList() -> Sequence[Province]:
         start = Data.PROVINCE_OFFSET
         size = Data.PROVINCE_SIZE
 
-        city_names = ["幽州", "幷州", "冀州", "青州", "兗州", "司州", "雍州", "涼州", "徐州", "予州", "荊州", "揚州", "益州", "交州"]
+        city_names = ["幽州", "幷州", "冀州", "青州", "兗州", "司州", "雍州", "涼州", "徐州", "予州", "荊州", "揚州",
+                      "益州", "交州"]
 
         plist = []
         for i in range(0, 41):
@@ -38,7 +39,7 @@ class RoTK2(object):
             p.No = Data.MapIndex[y][x]
             p.Name = city_names[name_index] + "-" + str(p.No)
             p.Offset = start + i * size
-            p.NextProvince = (city_data[0x01]<<8)+city_data[0x00]
+            p.NextProvince = (city_data[0x01] << 8) + city_data[0x00]
             p.RulerNo = city_data[0x10]
 
             p.WarRulerNo = city_data[0x11]
@@ -50,7 +51,7 @@ class RoTK2(object):
             p.FirstUnClaimedOfficerOffset = (city_data[0x05] << 8) + city_data[0x04]
             p.FreeOfficerOffset = (city_data[0x07] << 8) + city_data[0x06]
 
-            daili_mappings = {0: "",3:"未知", 4: "全权", 5: "内政", 6: "军事", 7: "人事"}
+            daili_mappings = {0: "", 3: "未知", 4: "全权", 5: "内政", 6: "军事", 7: "人事"}
             if daili < 8:
                 p.DelegateControl = daili_mappings[daili]
 
@@ -61,9 +62,9 @@ class RoTK2(object):
                 name_index = Data.BUF[start + size * zhanzhengjun + size - 1]
                 p.ProvinceInvade = city_names[name_index] + "-" + str(name_index + 1)
 
-            p.Gold = (city_data[0x09]<<8)+city_data[0x08]
+            p.Gold = (city_data[0x09] << 8) + city_data[0x08]
             p.Food = (city_data[0x0D] << 24) + (city_data[0x0C] << 16) + (city_data[0x0B] << 8) + city_data[0x0A]
-            p.Population = ((city_data[0x0F]<<8)+city_data[0x0E]) * 100
+            p.Population = ((city_data[0x0F] << 8) + city_data[0x0E]) * 100
             p.Land = city_data[0x16]
             p.Loyalty = city_data[0x17]
             p.Flood = city_data[0x18]
@@ -72,7 +73,7 @@ class RoTK2(object):
             p.RicePrice = city_data[0x1B]
 
             s = 0
-            next = (city_data[0x03]<<8)+city_data[0x02]
+            next = (city_data[0x03] << 8) + city_data[0x02]
             olist = []
             while next > 0:
                 gen = RoTK2.GetOfficerByOffset(next)
@@ -85,33 +86,33 @@ class RoTK2(object):
 
             p.UnClaimedOfficerNumber = 0
             p.UnclaimedOfficerList = []
-            if p.FirstUnClaimedOfficerOffset>0:
+            if p.FirstUnClaimedOfficerOffset > 0:
                 p.UnClaimedOfficerNumber = 1
                 gen = RoTK2.GetOfficerByOffset(p.FirstUnClaimedOfficerOffset)
                 gen.IsUnClaimed = True
                 p.UnclaimedOfficerList.append(gen)
-                #olist.append(gen)
+                # olist.append(gen)
                 next = gen.NextOfficerOffset
-                while next>0:
+                while next > 0:
                     gen = RoTK2.GetOfficerByOffset(next)
                     gen.IsUnClaimed = True
-                    #olist.append(gen)
+                    # olist.append(gen)
                     next = gen.NextOfficerOffset
                     p.UnClaimedOfficerNumber += 1
                     p.UnclaimedOfficerList.append(gen)
 
             p.FreeOfficerNumber = 0
-            if p.FreeOfficerOffset>0:
+            if p.FreeOfficerOffset > 0:
                 gen = RoTK2.GetOfficerByOffset(p.FreeOfficerOffset)
                 gen.IsFree = True
                 p.FreeOfficerNumber += 1
-                #olist.append(gen)
+                # olist.append(gen)
 
                 next = gen.NextOfficerOffset
                 while next > 0:
                     gen = RoTK2.GetOfficerByOffset(next)
                     gen.IsFree = True
-                    #olist.append(gen)
+                    # olist.append(gen)
                     next = gen.NextOfficerOffset
                     p.FreeOfficerNumber += 1
 
@@ -123,40 +124,42 @@ class RoTK2(object):
 
     @staticmethod
     def GetOfficerName(gen_offset):
-        if gen_offset=="":
+        if gen_offset == "":
             return ""
         ruler_name_data = ""
         index = 0
         while True:
-            if index>12:
+            if index > 12:
                 break
-            if Data.BUF[gen_offset+0x1c+index]==0:
+            if Data.BUF[gen_offset + 0x1c + index] == 0:
                 break
 
-            if Data.BUF[gen_offset+0x1c+index+0]<0x80:
-                ruler_name_data += chr(Data.BUF[gen_offset+0x1c+index+0])
+            if Data.BUF[gen_offset + 0x1c + index + 0] < 0x80:
+                ruler_name_data += chr(Data.BUF[gen_offset + 0x1c + index + 0])
                 index += 1
                 continue
 
-            s = Data.BUF[gen_offset+0x1c+index+0]*256+Data.BUF[gen_offset+0x1c+index+1]
+            s = Data.BUF[gen_offset + 0x1c + index + 0] * 256 + Data.BUF[gen_offset + 0x1c + index + 1]
 
-            if s not in [0xD8F0,0xD8F1,0xD8F2,0xD8F3,0xD8F4,0xD8F5]:
-                ruler_name_data+="$"+str(Data.CNINDEX[s])+"$"
+            if s not in [0xD8F0, 0xD8F1, 0xD8F2, 0xD8F3, 0xD8F4, 0xD8F5]:
+                ruler_name_data += "$" + str(Data.CNINDEX[s]) + "$"
             else:
-                ruler_name_data+="$"+str(s)+"$"
-            index+=2
+                ruler_name_data += "$" + str(s) + "$"
+            index += 2
 
         return ruler_name_data
+
     @staticmethod
-    def GetOfficerList()->Sequence[Officer]:
+    def GetOfficerList() -> Sequence[Officer]:
         pos = Data.OFFICER_OFFSET
         size = Data.OFFICER_SIZE
 
         gen_no = 0
-        olist  = []
+        olist = []
 
         while True:
-            tmp = RoTK2.GetOfficerFromBuffer(Data.BUF[pos + size * gen_no:pos + size * gen_no + size], gen_no, Data.BUF[0x45] * 256 + Data.BUF[0x44])
+            tmp = RoTK2.GetOfficerFromBuffer(Data.BUF[pos + size * gen_no:pos + size * gen_no + size], gen_no,
+                                             Data.BUF[0x45] * 256 + Data.BUF[0x44])
             olist.append(tmp)
 
             gen_no += 1
@@ -177,7 +180,7 @@ class RoTK2(object):
         return olist
 
     @staticmethod
-    def GetProvinceByOffset(offset)->Province:
+    def GetProvinceByOffset(offset) -> Province:
         ret = None
 
         for c in RoTK2.GetProvinceList():
@@ -188,40 +191,42 @@ class RoTK2(object):
         return ret
 
     @staticmethod
-    def GetProvinceBySequence(sequence)->Province:
-        return RoTK2.GetProvinceList()[sequence-1]
+    def GetProvinceBySequence(sequence) -> Province:
+        return RoTK2.GetProvinceList()[sequence - 1]
 
     @staticmethod
     def GetCurrentProvinceNo():
-        return RoTK2.GetProvinceByOffset((Data.BUF[Data.CURRENT_PROVINCE_OFFSET+1] << 8) + Data.BUF[Data.CURRENT_PROVINCE_OFFSET]).No
+        return RoTK2.GetProvinceByOffset(
+            (Data.BUF[Data.CURRENT_PROVINCE_OFFSET + 1] << 8) + Data.BUF[Data.CURRENT_PROVINCE_OFFSET]).No
 
     @staticmethod
-    def GetProvincesByRulerNo(ruler_no)->Sequence[Province]:
+    def GetProvincesByRulerNo(ruler_no) -> Sequence[Province]:
         plist = []
         for p in RoTK2.GetProvinceList():
-            if p.RulerNo==ruler_no:
+            if p.RulerNo == ruler_no:
                 plist.append(p)
 
         return plist
+
     @staticmethod
     def FlushData():
         for p in Province.Init():
-            off = RoTK2.PROVINCE_OFFSET+(p.No-1)*RoTK2.PROVINCE_SIZE
-            Data.BUF[off+0x00] = p.NextProvince%256
-            Data.BUF[off + 0x01] = p.NextProvince >>8
+            off = RoTK2.PROVINCE_OFFSET + (p.No - 1) * RoTK2.PROVINCE_SIZE
+            Data.BUF[off + 0x00] = p.NextProvince % 256
+            Data.BUF[off + 0x01] = p.NextProvince >> 8
             Data.BUF[off + 0x10] = p.RulerNo
             Data.BUF[off + 0x11] = p.WarRulerNo
 
             Data.BUF[off + 0x02] = (p.GovernorOffset + 0x38) % 256
             Data.BUF[off + 0x03] = (p.GovernorOffset + 0x38) >> 8
-            Data.BUF[off + 0x08] = p.Gold%256
-            Data.BUF[off + 0x09] = p.Gold>>8
+            Data.BUF[off + 0x08] = p.Gold % 256
+            Data.BUF[off + 0x09] = p.Gold >> 8
             Data.BUF[off + 0x0A] = p.Food % 256
             Data.BUF[off + 0x0B] = (p.Food >> 8) % 256
             Data.BUF[off + 0x0C] = (p.Food >> 16) % 256
             Data.BUF[off + 0x0D] = p.Food >> 24
-            Data.BUF[off + 0x0E] = int((p.Population/100)) % 256
-            Data.BUF[off + 0x0F] = int((p.Population/100)) >>8
+            Data.BUF[off + 0x0E] = int((p.Population / 100)) % 256
+            Data.BUF[off + 0x0F] = int((p.Population / 100)) >> 8
 
             Data.BUF[off + 0x16] = p.Land
             Data.BUF[off + 0x17] = p.Loyalty
@@ -232,40 +237,40 @@ class RoTK2(object):
             Data.BUF[off + 0x1B] = p.RicePrice
 
     @staticmethod
-    def ReOrderOfficers(prov_no, flag:ShowOfficerFlag):
+    def ReOrderOfficers(prov_no, flag: ShowOfficerFlag):
         officer_list = RoTK2.GetProvinceBySequence(prov_no).OfficerList
-        if len(officer_list)<1:
+        if len(officer_list) < 1:
             return
 
         governor = officer_list[0]
-        if len(officer_list)>1:
+        if len(officer_list) > 1:
             new_list = []
             for o in officer_list[1:]:
                 if o.IsUnClaimed or o.IsFree:
                     continue
                 new_list.append(o)
 
-            if flag==ShowOfficerFlag.Int:
-                olist = sorted(new_list,key=lambda x:x.Int,reverse=True)
-            elif flag==ShowOfficerFlag.War:
-                olist = sorted(new_list,key=lambda x:x.War,reverse=True)
-            elif flag==ShowOfficerFlag.Chm:
-                olist = sorted(new_list,key=lambda x:x.Chm,reverse=True)
-            elif flag==ShowOfficerFlag.Soldiers:
-                olist = sorted(new_list,key=lambda x:x.Soldiers,reverse=True)
-            elif flag==ShowOfficerFlag.Loyalty:
-                olist = sorted(new_list,key=lambda x:x.Loyalty,reverse=True)
+            if flag == ShowOfficerFlag.Int:
+                olist = sorted(new_list, key=lambda x: x.Int, reverse=True)
+            elif flag == ShowOfficerFlag.War:
+                olist = sorted(new_list, key=lambda x: x.War, reverse=True)
+            elif flag == ShowOfficerFlag.Chm:
+                olist = sorted(new_list, key=lambda x: x.Chm, reverse=True)
+            elif flag == ShowOfficerFlag.Soldiers:
+                olist = sorted(new_list, key=lambda x: x.Soldiers, reverse=True)
+            elif flag == ShowOfficerFlag.Loyalty:
+                olist = sorted(new_list, key=lambda x: x.Loyalty, reverse=True)
             else:
                 raise Exception("Invalid sorted flag.")
 
             governor.NextOfficerOffset = olist[0].Offset
             RoTK2.FlushOfficer(governor)
 
-            for i in range(0,len(olist)):
-                if i==len(olist)-1:
+            for i in range(0, len(olist)):
+                if i == len(olist) - 1:
                     olist[i].NextOfficerOffset = 0
                 else:
-                    olist[i].NextOfficerOffset = olist[i+1].Offset
+                    olist[i].NextOfficerOffset = olist[i + 1].Offset
 
                 RoTK2.FlushOfficer(olist[i])
 
@@ -273,7 +278,7 @@ class RoTK2(object):
             Data.ProvinceList = RoTK2.GetProvinceList()
 
     @staticmethod
-    def FlushOfficer(officer:Officer):
+    def FlushOfficer(officer: Officer):
         Data.BUF[officer.Offset + 0x00] = officer.NextOfficerOffset % 256
         Data.BUF[officer.Offset + 0x01] = officer.NextOfficerOffset >> 8
 
@@ -299,7 +304,7 @@ class RoTK2(object):
 
         Data.OfficerList = RoTK2.GetOfficerList()
 
-    def FlushProvince(province:Province):
+    def FlushProvince(province: Province):
         Data.BUF[province.Offset + 0x00] = province.NextProvince % 256
         Data.BUF[province.Offset + 0x01] = province.NextProvince >> 8
         Data.BUF[province.Offset + 0x02] = province.GovernorOffset % 256
@@ -331,13 +336,14 @@ class RoTK2(object):
     @staticmethod
     def GetOfficeName(name1, name2, name3, name4, name5, name6):
         name_list = {0xaba6: "劉", 0xab9f: "備", 0xFB92: "公", 0x309B: "孫", 0xBBAE: "瓚", 0xBCA1: "越", 0xEA9C: "馬",
-                     0xD5AD: "騰",0xD0A4:"廖",0x46A8:"賢",0x669E:"淳",0xCDAC:"瓊",0x4A94:"仲",0xD7A5:"興",0xD998:"姜",0xC3A5:"維",0xF7A7:"誕",0x949E:"爽",
-                     0x8D98: "候", 0xD8A9: "選", 0x32A1: "程", 0x6DA6: "銀",0xD2AA:"禅",0x509B:"師",
-                     0x59AD: "關", 0xD094: "羽", 0xAE9D: "張", 0x9A9A: "飛",0x8B98:"信",
+                     0xD5AD: "騰", 0xD0A4: "廖", 0x46A8: "賢", 0x669E: "淳", 0xCDAC: "瓊", 0x4A94: "仲", 0xD7A5: "興",
+                     0xD998: "姜", 0xC3A5: "維", 0xF7A7: "誕", 0x949E: "爽",
+                     0x8D98: "候", 0xD8A9: "選", 0x32A1: "程", 0x6DA6: "銀", 0xD2AA: "禅", 0x509B: "師",
+                     0x59AD: "關", 0xD094: "羽", 0xAE9D: "張", 0x9A9A: "飛", 0x8B98: "信",
                      0X989F: "陶", 0X65AB: "謙", 0XF09C: "乾",
                      0X949F: "陳", 0XF3A0: "登", 0XDCAA: "糜", 0X3998: "竺",
                      0X5398: "芳",
-                     0XF0D8: "马",0XF1D8: "述",0XF2D8: "杰",0XF3D8: "屈",0XF4D8: "世",0XF5D8: "宏",
+                     0XF0D8: "马", 0XF1D8: "述", 0XF2D8: "杰", 0XF3D8: "屈", 0XF4D8: "世", 0XF5D8: "宏",
                      0XAF9C: "袁", 0X4A9F: "術", 0X479A: "胤", 0XF899: "紀",
                      0XF0AE: "靈", 0X56A7: "樂", 0XF29F: "就", 0XB9A8: "動",
                      0X949F: "陳", 0X31AE: "蘭", 0XD695: "李", 0X58AC: "豐",
@@ -424,15 +430,17 @@ class RoTK2(object):
                      0XC892: "士", 0XAAAA: "濬", 0X6998: "虎", 0XA2A0: "欽", 0X9AC2: "粲", 0XCCA1: "逵", 0XF0AB: "禮",
                      0XAE95: "彤",
                      0XE592: "之", 0X78A4: "靖", 0X4B99: "恪",
-                     0XDF93: "母", 0X8493: "丘", 0XA6A6: "儉", 0XE394: "艾", 0XC5CA: "叡", 0x4699: "恢", 0xE692: "尹", 0x52AA: "默",
-                     0x5193: "巴",0xA0A6: "儀", 0x85AC: "双", 0x82A1: "著",0xE695:"沙",0xF6A6:"摩",0xAA93:"可",0xEFA7:"褒",0x43A4:"遂",0xEEA8:"暹"
+                     0XDF93: "母", 0X8493: "丘", 0XA6A6: "儉", 0XE394: "艾", 0XC5CA: "叡", 0x4699: "恢", 0xE692: "尹",
+                     0x52AA: "默",
+                     0x5193: "巴", 0xA0A6: "儀", 0x85AC: "双", 0x82A1: "著", 0xE695: "沙", 0xF6A6: "摩", 0xAA93: "可",
+                     0xEFA7: "褒", 0x43A4: "遂", 0xEEA8: "暹"
                      }
 
-        name1_1 = name1>>8
+        name1_1 = name1 >> 8
         name1_2 = name1 & 0xff
-        name2_1 = name2>>8
+        name2_1 = name2 >> 8
         name2_2 = name2 & 0xff
-        name3_1 = name3>>8
+        name3_1 = name3 >> 8
         name3_2 = name3 & 0xff
         name4_1 = name4 >> 8
         name4_2 = name4 & 0xff
@@ -441,13 +449,13 @@ class RoTK2(object):
         name6_1 = name6 >> 8
         name6_2 = name6 & 0xff
 
-
-        if name1+name2+name3+name4+name5+name6==0:
+        if name1 + name2 + name3 + name4 + name5 + name6 == 0:
             return ""
 
-        if  name1_1<0x80 and name1_2<0x80 and name2_1<0x80 and name2_2<0x80 and name3_1<0x80 and name3_2<0x80 and name4_1<0x80 and name4_2<0x80 and name5_1<0x80 and name5_2<0x80 and name6_1<0x80 and name6_2<0x80:
-            name = chr(name1_2)+chr(name1_1)+chr(name2_2)+chr(name2_1)+chr(name3_2)+chr(name3_1)+chr(name4_2)+chr(name4_1)+chr(name5_2)+chr(name5_1)+chr(name6_2)+chr(name6_1)
-            return name.replace("\0","")
+        if name1_1 < 0x80 and name1_2 < 0x80 and name2_1 < 0x80 and name2_2 < 0x80 and name3_1 < 0x80 and name3_2 < 0x80 and name4_1 < 0x80 and name4_2 < 0x80 and name5_1 < 0x80 and name5_2 < 0x80 and name6_1 < 0x80 and name6_2 < 0x80:
+            name = chr(name1_2) + chr(name1_1) + chr(name2_2) + chr(name2_1) + chr(name3_2) + chr(name3_1) + chr(
+                name4_2) + chr(name4_1) + chr(name5_2) + chr(name5_1) + chr(name6_2) + chr(name6_1)
+            return name.replace("\0", "")
 
         name = ""
         if name_list.__contains__(name1):
@@ -486,26 +494,34 @@ class RoTK2(object):
         return name
 
     @staticmethod
-    def IsRuler(officer:Officer):
+    def IsRuler(officer: Officer):
         for i in range(0, 16):
-            if officer.Offset == Data.BUF[Data.RULER_START + Data.RULER_SIZE * i + 1] * 256 +Data.BUF[Data.RULER_START + Data.RULER_SIZE * i]:
+            if officer.Offset == Data.BUF[Data.RULER_START + Data.RULER_SIZE * i + 1] * 256 + Data.BUF[
+                Data.RULER_START + Data.RULER_SIZE * i]:
                 return True
         return False
 
     @staticmethod
-    def IsAdvisor(officer:Officer):
+    def IsAdvisor(officer: Officer):
         for i in range(0, 16):
-            if officer.Offset == Data.BUF[Data.RULER_START + Data.RULER_SIZE * i + 5] * 256 +Data.BUF[Data.RULER_START + Data.RULER_SIZE * i + 4]:
+            if officer.Offset == Data.BUF[Data.RULER_START + Data.RULER_SIZE * i + 5] * 256 + Data.BUF[
+                Data.RULER_START + Data.RULER_SIZE * i + 4]:
                 return True
 
         return False
 
     @staticmethod
     def GetAdvisor():
-        current_ruler_offset = Data.BUF[Data.CURRENT_RULER_OFFSET+1]*256+Data.BUF[Data.CURRENT_RULER_OFFSET]
-        ruler_no = int((Data.RULER_OFFSET - current_ruler_offset)/Data.RULER_SIZE)
-        advisor_offset = Data.BUF[current_ruler_offset+5]*256+Data.BUF[current_ruler_offset+4]
+        current_ruler_offset = Data.BUF[Data.CURRENT_RULER_OFFSET + 1] * 256 + Data.BUF[Data.CURRENT_RULER_OFFSET]
+        ruler_no = int((Data.RULER_OFFSET - current_ruler_offset) / Data.RULER_SIZE)
+        advisor_offset = Data.BUF[current_ruler_offset + 5] * 256 + Data.BUF[current_ruler_offset + 4]
         return RoTK2.GetOfficerByOffset(advisor_offset)
+
+    @staticmethod
+    def SetAdvisor(officer):
+        current_ruler_offset = Data.BUF[Data.CURRENT_RULER_OFFSET + 1] * 256 + Data.BUF[Data.CURRENT_RULER_OFFSET]
+        Data.BUF[current_ruler_offset + 5] = officer.Offset >> 8
+        Data.BUF[current_ruler_offset + 4] = officer.Offset % 256
 
     @staticmethod
     def GetAdvisorProvince():
@@ -528,28 +544,31 @@ class RoTK2(object):
 
     @staticmethod
     def GetRulerProvinceNo(province_offset):
-        return int((province_offset - 0x2DC4)/0x23)
+        return int((province_offset - 0x2DC4) / 0x23)
 
     @staticmethod
     def GetHuatuo():
         return Data.BUF[0x2B32]
 
     @staticmethod
-    def IsGoverner(officer:Officer):
+    def IsGoverner(officer: Officer):
         for i in range(0, 41):
-            if officer.Offset == Data.BUF[Data.PROVINCE_START + Data.PROVINCE_SIZE * i  + 3] * 256 + Data.BUF[Data.PROVINCE_START + Data.PROVINCE_SIZE * i  + 2]:
+            if officer.Offset == Data.BUF[Data.PROVINCE_START + Data.PROVINCE_SIZE * i + 3] * 256 + Data.BUF[
+                Data.PROVINCE_START + Data.PROVINCE_SIZE * i + 2]:
                 return True
         return False
 
     @staticmethod
-    def GetOfficerFromBuffer(buffer, gen_no, year)->Officer:
+    def GetOfficerFromBuffer(buffer, gen_no, year) -> Officer:
         o = Officer()
         o.Offset = Data.OFFICER_OFFSET + Data.OFFICER_SIZE * gen_no
         o.NextOfficerOffset = (buffer[0x01] << 8) + buffer[0x00]
 
-        o.Name = RoTK2.GetOfficeName((buffer[0x1D] << 8) + buffer[0x1C], (buffer[0x1F] << 8) + buffer[0x1E], (buffer[0x21] << 8) + buffer[0x20],
-                           (buffer[0x23] << 8) + buffer[0x22], (buffer[0x25] << 8) + buffer[0x24], (buffer[0x27] << 8) + buffer[0x26]
-                           )
+        o.Name = RoTK2.GetOfficeName((buffer[0x1D] << 8) + buffer[0x1C], (buffer[0x1F] << 8) + buffer[0x1E],
+                                     (buffer[0x21] << 8) + buffer[0x20],
+                                     (buffer[0x23] << 8) + buffer[0x22], (buffer[0x25] << 8) + buffer[0x24],
+                                     (buffer[0x27] << 8) + buffer[0x26]
+                                     )
         o.Int = buffer[0x04]
         o.War = buffer[0x05]
         o.Chm = buffer[0x06]
@@ -566,14 +585,14 @@ class RoTK2(object):
         o.xueyuan = (buffer[0x11] << 8) + buffer[0x10]
         o.Soldiers = (buffer[0x13] << 8) + buffer[0x12]
         o.Weapons = (buffer[0x15] << 8) + buffer[0x14]
-        if o.Soldiers==0:
+        if o.Soldiers == 0:
             o.Arms = 100
         else:
-            o.Arms = min(int((100*o.Weapons)/o.Soldiers),100)
+            o.Arms = min(int((100 * o.Weapons) / o.Soldiers), 100)
         o.TrainingLevel = buffer[0x16]
         o.Age = year - buffer[0x19] + 1
 
-        o.IsSick = (buffer[0x03] &0x0f)>0
+        o.IsSick = (buffer[0x03] & 0x0f) > 0
         o.SickMonth = buffer[0x03] & 0x0f
 
         o.WillDieInNextYear = buffer[0x02] >> 4
@@ -583,26 +602,27 @@ class RoTK2(object):
         return o
 
     @staticmethod
-    def GetOfficerByOffset(offset)->Officer:
-        if offset==0:
+    def GetOfficerByOffset(offset) -> Officer:
+        if offset == 0:
             return None
 
-        if (offset - Data.OFFICER_OFFSET)%Data.OFFICER_SIZE>0:
+        if (offset - Data.OFFICER_OFFSET) % Data.OFFICER_SIZE > 0:
             raise Exception("Invalid officer offset.")
 
-        seq = int((offset - Data.OFFICER_OFFSET)/Data.OFFICER_SIZE)
+        seq = int((offset - Data.OFFICER_OFFSET) / Data.OFFICER_SIZE)
 
-        return RoTK2.GetOfficerFromBuffer(Data.BUF[offset:offset+Data.OFFICER_SIZE],seq,Data.BUF[0x45]*256+Data.BUF[0x44])
+        return RoTK2.GetOfficerFromBuffer(Data.BUF[offset:offset + Data.OFFICER_SIZE], seq,
+                                          Data.BUF[0x45] * 256 + Data.BUF[0x44])
 
     @staticmethod
     def GetStoredOfficerList(seq):
         gamedata = bytearray(RoTK2.SCENARIO)
         size = 0x2b
 
-        pos_list = [0x16,0x33c5,0x6774,0x9b23,0xced2,0x10281]
-        year_list = [189,194,201,208,215,220]
+        pos_list = [0x16, 0x33c5, 0x6774, 0x9b23, 0xced2, 0x10281]
+        year_list = [189, 194, 201, 208, 215, 220]
         pos = pos_list[seq]
-        #for pos in pos_list:
+        # for pos in pos_list:
         gen_no = 0
         gen_list = []
 
@@ -612,7 +632,7 @@ class RoTK2(object):
 
             gen_no += 1
 
-            if tmp.Int==0 and tmp.War==0 and tmp.Chm==0:
+            if tmp.Int == 0 and tmp.War == 0 and tmp.Chm == 0:
                 break
 
             gen_list.append(tmp)
@@ -633,12 +653,12 @@ class RoTK2(object):
         gen_list = []
 
         while True:
-            if pos + size * gen_no+9>len(gamedata):
+            if pos + size * gen_no + 9 > len(gamedata):
                 break
-            gen = gamedata[pos + size * gen_no+3:pos + size * gen_no + size]
+            gen = gamedata[pos + size * gen_no + 3:pos + size * gen_no + size]
             tmp = RoTK2.GetOfficerFromBuffer(gen, gen_no, pos, size, 220)
 
-            if tmp.Int==0 and tmp.War==0 and tmp.Chm==0:
+            if tmp.Int == 0 and tmp.War == 0 and tmp.Chm == 0:
                 break
 
             gen_list.append(tmp)
@@ -652,22 +672,22 @@ class RoTK2(object):
     @staticmethod
     def FlushGenerals():
         for o in RoTK2.GetList():
-            if o.Name=="":
+            if o.Name == "":
                 continue
 
-            RoTK2.SaveData[o.Offset+0x00] = (o.NextOfficerOffset+0x38)%256
-            RoTK2.SaveData[o.Offset + 0x01] = (o.NextOfficerOffset + 0x38) >>8
+            RoTK2.SaveData[o.Offset + 0x00] = (o.NextOfficerOffset + 0x38) % 256
+            RoTK2.SaveData[o.Offset + 0x01] = (o.NextOfficerOffset + 0x38) >> 8
 
-            RoTK2.SaveData[o.Offset +0x04]=o.Int
-            RoTK2.SaveData[o.Offset +0x05]=o.War
-            RoTK2.SaveData[o.Offset +0x06]=o.Chm
+            RoTK2.SaveData[o.Offset + 0x04] = o.Int
+            RoTK2.SaveData[o.Offset + 0x05] = o.War
+            RoTK2.SaveData[o.Offset + 0x06] = o.Chm
             RoTK2.SaveData[o.Offset + 0x07] = o.yili
             RoTK2.SaveData[o.Offset + 0x08] = o.rende
             RoTK2.SaveData[o.Offset + 0x09] = o.yewang
             RoTK2.SaveData[o.Offset + 0x0A] = o.RulerNo
-            RoTK2.SaveData[o.Offset +0x0B]=o.Loyalty
+            RoTK2.SaveData[o.Offset + 0x0B] = o.Loyalty
             RoTK2.SaveData[o.Offset + 0x12] = o.Soldiers % 256
-            RoTK2.SaveData[o.Offset + 0x13] = o.Soldiers >>8
+            RoTK2.SaveData[o.Offset + 0x13] = o.Soldiers >> 8
             RoTK2.SaveData[o.Offset + 0x14] = o.Weapons % 256
             RoTK2.SaveData[o.Offset + 0x15] = o.Weapons >> 8
             RoTK2.SaveData[o.Offset + 0x16] = o.TrainingLevel
@@ -678,49 +698,49 @@ class RoTK2(object):
             RoTK2.SaveData[o.Offset + 0x0E] = o.SpyInCityNo
             RoTK2.SaveData[o.Offset + 0x0F] = o.Compatibility
 
-
     @staticmethod
-    def GetRulerList()->Sequence[Ruler]:
+    def GetRulerList() -> Sequence[Ruler]:
         rlist = []
         ruler_num = 0x0f
         start = Data.RULER_OFFSET
         size = Data.RULER_SIZE
 
-        for i in range(0,0x10):
+        for i in range(0, 0x10):
             ruler_offset = (Data.BUF[start + i * size + 1] << 8) + Data.BUF[start + i * size + 0]
-            if ruler_offset==0:
+            if ruler_offset == 0:
                 continue
             ruler_city_offset = (Data.BUF[start + i * size + 3] << 8) + Data.BUF[start + i * size + 2]
             aa_offset = (Data.BUF[start + i * size + 5] << 8) + Data.BUF[start + i * size + 4]
-            relationships_data = "{0:b}".format(Data.BUF[start + i * size + 0x0A]).zfill(8)[::-1] + "{0:b}".format(Data.BUF[start + i * size + 0x0B]).zfill(8)[::-1]
+            relationships_data = "{0:b}".format(Data.BUF[start + i * size + 0x0A]).zfill(8)[::-1] + "{0:b}".format(
+                Data.BUF[start + i * size + 0x0B]).zfill(8)[::-1]
 
             order = (Data.BUF[start + i * size + 0x0d] << 8) + Data.BUF[start + i * size + 0x0c]
 
             k = Ruler()
-            k.Offset = start + i*size
+            k.Offset = start + i * size
             k.No = i
             k.RulerSelf = RoTK2.GetOfficerByOffset(ruler_offset)
-            if ruler_city_offset>-1:#君主可能流浪了
+            if ruler_city_offset > -1:  # 君主可能流浪了
                 k.HomeCity = RoTK2.GetProvinceByOffset(ruler_city_offset)
-            if aa_offset>-1:#君主可能流浪了
+            if aa_offset > -1:  # 君主可能流浪了
                 k.Advisor = RoTK2.GetOfficerByOffset(aa_offset)
             k.TrustRating = Data.BUF[start + i * size + 6]
             k.Order = order
 
             k.RelationShips = {}
             for j in range(0, 16):
-                #key:   Alliance
-                #value: Hostility
-                k.RelationShips[j] =[relationships_data[j], Data.BUF[start + j * size + 0x0e + i]]
+                # key:   Alliance
+                # value: Hostility
+                k.RelationShips[j] = [relationships_data[j], Data.BUF[start + j * size + 0x0e + i]]
 
-            k.IsWandering = (Data.BUF[start+j*size+0x22] != 0xff)
+            k.IsWandering = (Data.BUF[start + j * size + 0x22] != 0xff)
             rlist.append(k)
 
         return rlist
 
     @staticmethod
-    def GetRulerByNo(no)->Ruler:
-        if no==0xff:
+    def GetRulerByNo(no) -> Ruler:
+        if no == 0xff:
             k = Ruler()
             k.RulerSelf = Officer()
             k.No = no
@@ -752,20 +772,21 @@ class RoTK2(object):
 
     @staticmethod
     def GetCurrentRulerOfficerOffset():
-        return Data.BUF[Data.CURRENT_RULER_OFFICER_OFFSET+1]*256+Data.BUF[Data.CURRENT_RULER_OFFICER_OFFSET+0]
-    @staticmethod
-    def CanOfficerDoAction(officer:Officer)->bool:
-        return ((Data.BUF[officer.Offset+2] & 1) != 1)
-        # 生病暂时不知道是否需要判断
-        #or ((Data.BUF[officer.Offset+3] & 1) != 1)
+        return Data.BUF[Data.CURRENT_RULER_OFFICER_OFFSET + 1] * 256 + Data.BUF[Data.CURRENT_RULER_OFFICER_OFFSET + 0]
 
     @staticmethod
-    def SetOfficerAlreadyDoAction(officer:Officer):
-        status = Data.BUF[officer.Offset+2]
+    def CanOfficerDoAction(officer: Officer) -> bool:
+        return ((Data.BUF[officer.Offset + 2] & 1) != 1)
+        # 生病暂时不知道是否需要判断
+        # or ((Data.BUF[officer.Offset+3] & 1) != 1)
+
+    @staticmethod
+    def SetOfficerAlreadyDoAction(officer: Officer):
+        status = Data.BUF[officer.Offset + 2]
         Data.BUF[officer.Offset + 2] = status | 1
 
     @staticmethod
-    def IsAllOfficerFreeze(province:Province)->bool:
+    def IsAllOfficerFreeze(province: Province) -> bool:
         freeze = True
         p = RoTK2.GetProvinceBySequence(province)
         for o in p.OfficerList:
@@ -774,15 +795,16 @@ class RoTK2(object):
                 break
 
         return freeze
+
     @staticmethod
     def Save(fname):
-        header=bytearray(
-            [0x31,0x39,0x39,0x30,0x2e,0x30,0x32,0x2e,0x31,0x39,0x00,0x00,0xbd,0x00,0x00,0x0f,
-            0x03,0x06,0x0a,0x0a,0x04,0x05,0x0b,0x08,0x00,0x0f,0x02,0x0e,0x0c,0x09,0x0d,0x07]
-                         )
+        header = bytearray(
+            [0x31, 0x39, 0x39, 0x30, 0x2e, 0x30, 0x32, 0x2e, 0x31, 0x39, 0x00, 0x00, 0xbd, 0x00, 0x00, 0x0f,
+             0x03, 0x06, 0x0a, 0x0a, 0x04, 0x05, 0x0b, 0x08, 0x00, 0x0f, 0x02, 0x0e, 0x0c, 0x09, 0x0d, 0x07]
+        )
 
-        buf = header+Data.BUF[0x58:]
-        with open(fname,"wb") as f:
+        buf = header + Data.BUF[0x58:]
+        with open(fname, "wb") as f:
             f.write(buf)
 
     @staticmethod
@@ -793,9 +815,9 @@ class RoTK2(object):
             magic = 0
 
             for province in RoTK2.GetProvincesByRulerNo(ruler.No):
-                magic += len(province.OfficerList)*100 + int(province.Soldiers/100)
+                magic += len(province.OfficerList) * 100 + int(province.Soldiers / 100)
 
-            Data.BUF[ruler.Offset+0x0c] = magic % 256
+            Data.BUF[ruler.Offset + 0x0c] = magic % 256
             Data.BUF[ruler.Offset + 0x0d] = int(magic / 256)
 
         ruler_list = RoTK2.GetRulerList()
@@ -810,15 +832,15 @@ class RoTK2(object):
 
     @staticmethod
     def IsProvinceRuledByCurrentRuler(province_no):
-        offset = Data.PROVINCE_OFFSET + (province_no-1)*Data.PROVINCE_SIZE
-        ruler_no = Data.BUF[offset+0x10]
+        offset = Data.PROVINCE_OFFSET + (province_no - 1) * Data.PROVINCE_SIZE
+        ruler_no = Data.BUF[offset + 0x10]
 
-        offset = Data.BUF[0x335D+Data.OFFSET]*256+Data.BUF[0x335C+Data.OFFSET]
-        ruler_no2 = int((offset-Data.RULER_OFFSET)/Data.RULER_SIZE)
+        offset = Data.BUF[0x335D + Data.OFFSET] * 256 + Data.BUF[0x335C + Data.OFFSET]
+        ruler_no2 = int((offset - Data.RULER_OFFSET) / Data.RULER_SIZE)
 
         return ruler_no == ruler_no2
 
     @staticmethod
     def GetProvinceDelegateStatus(province_no):
         offset = Data.PROVINCE_OFFSET + (province_no - 1) * Data.PROVINCE_SIZE
-        return Data.BUF[offset+0x12]
+        return Data.BUF[offset + 0x12]

@@ -4,9 +4,9 @@ import random
 
 from Data import Data, ShowOfficerFlag
 import pygame, sys
-from Helper import Helper
-from RoTK2 import RoTK2
+from Helper import Helper,Province,Officer,Ruler
 from Data import DelegateMode
+
 
 
 class Command5(object):
@@ -15,14 +15,14 @@ class Command5(object):
 
     def Start(self, province_no):
         self.province_no = province_no
-        self.province = RoTK2.GetProvinceBySequence(province_no)
+        self.province = Province.FromSequence(province_no)
 
         commands = [Helper.GetBuiltinText(0x6F78, 0x6F7B), Helper.GetBuiltinText(0x6F81, 0x6F84),
                     Helper.GetBuiltinText(0x6F8A, 0x6F8D), Helper.GetBuiltinText(0x6F93, 0x6F96)]
         Helper.ClearInputArea()
 
         commands_color = [5, 5, 5, 5]
-        is_ruler = RoTK2.IsRuler(self.province.OfficerList[0])
+        is_ruler = self.province.GetOfficerList()[0].IsRuler()
         if is_ruler is False:
             commands_color = [5, 5, 4, 4]
         Helper.ShowCommandsInInputArea(commands, 4, width=60, palette_no=5, commands_color=commands_color)
@@ -49,49 +49,49 @@ class Command5(object):
                                               required_number_max=41)
                 if province_no < 1:
                     return
-                province = RoTK2.GetProvinceBySequence(province_no)
-                if province.RulerNo != 0xFF and province.WarRulerNo == 0xFF and Helper.Is2ProvincesAreSameRuler(
+                province = Province.FromSequence(province_no)
+                if province.RulerNo != 0xFF and province.WarRulerNo == 0xFF and Province.Is2ProvincesBelongToSameRuler(
                         self.province_no, province_no) is False:
                     # enemy's province
                     is_enemy = True
-                    num = len(province.OfficerList)
-                    if RoTK2.GetRulerByNo(province.RulerNo).RulerSelf.Offset == province.OfficerList[0].Offset:
+                    num = len(province.GetOfficerList())
+                    if Ruler.FromNo(province.RulerNo).RulerSelf.Offset == province.GetOfficerList()[0].Offset:
                         num -= 1
                     if num == 0:
                         Helper.ShowDelayedText(Helper.GetBuiltinText(0x6F63), clear_input_area=False)
                         return
-                    officer_list = province.OfficerList
+                    officer_list = province.GetOfficerList()
                     break
 
-                if Helper.Is2ProvincesAreSameRuler(self.province_no, province_no) and self.province_no != province_no:
+                if Province.Is2ProvincesBelongToSameRuler(self.province_no, province_no) and self.province_no != province_no:
                     continue
                 if self.province.Offset == province.Offset:  # ruler's central province
-                    if self.province.UnClaimedOfficerNumber == 0:
+                    if len(self.province.GetUnclaimedOfficerList()) == 0:
                         Helper.ShowDelayedText(Helper.GetBuiltinText(0x6F56))
                         return
                     province = self.province
-                    officer_list = province.UnclaimedOfficerList
+                    officer_list = province.GetUnclaimedOfficerList()
                     break
         else:  # ruler's general province
-            if self.province.UnClaimedOfficerNumber == 0:
+            if len(self.province.GetUnclaimedOfficerList()) == 0:
                 Helper.ShowDelayedText(Helper.GetBuiltinText(0x6F56))
                 return
             province = self.province
-            officer_list = province.UnclaimedOfficerList
+            officer_list = province.GetUnclaimedOfficerList()
 
         Helper.ClearInputArea()
         # will hire who?
-        is_ruler = RoTK2.IsRuler(RoTK2.GetOfficerByOffset(RoTK2.GetProvinceBySequence(province.No).GovernorOffset))
+        is_ruler = Officer.FromOffset(Province.FromSequence(province.No).GovernorOffset).IsRuler()
         officer_no = Helper.SelectOfficer(province.No, Helper.GetBuiltinText(0x6F37), ShowOfficerFlag.Empty,
                                           offical=is_enemy,
-                                          show_governor=not is_ruler, enemy_province=True,check_can_action=False)
+                                          show_governor=True, enemy_province=True,check_can_action=False)
         if officer_no < 1:
             return
 
         officer_will_be_hired = officer_list[officer_no - 1]
         self.ShowOfficer(officer_will_be_hired)
         yn = Helper.GetInput(
-            RoTK2.GetOfficerName(officer_will_be_hired.Offset) + Helper.GetBuiltinText(0x3D7D) + "(Y/N)? ", yesno=True)
+            officer_will_be_hired.GetName() + Helper.GetBuiltinText(0x3D7D) + "(Y/N)? ", yesno=True)
         if yn != "y":
             return
 
@@ -107,14 +107,14 @@ class Command5(object):
             return
 
         if v_b10c > 0:
-            officer_no = Helper.SelectOfficer(province.No, Helper.GetBuiltinText(0x6F3E), ShowOfficerFlag.Chm,
+            officer_no = Helper.SelectOfficer(self.province_no, Helper.GetBuiltinText(0x6F3E), ShowOfficerFlag.Chm,
                                               offical=True)
             if officer_no < 1:
                 return
 
-            officer_will_hire = province.OfficerList[officer_no - 1]
+            officer_will_hire = Province.FromSequence(self.province_no).GetOfficerList()[officer_no - 1]
         else:
-            officer_will_hire = RoTK2.GetOfficerByOffset(province.GovernorOffset)
+            officer_will_hire = Officer.FromOffset(province.GovernorOffset)
 
         data = self.GetSuccessPercentage(v_b10c, officer_will_be_hired, officer_will_hire,
                                          (province.Offset == self.province.Offset))
@@ -128,7 +128,7 @@ class Command5(object):
         if v_b10c == 1:
             Data.BUF[self.province.Offset + 0x19] -= 1
         if v_b10c == 2:
-            Helper.SetWordToOffset(Data.BUF, Helper.GetWordFromOffset(Data.BUF, self.province.Offset + 0x08) - 100,
+            Helper.SetWordToOffset(Data.BUF, Data.GetWordFromOffset(Data.BUF, self.province.Offset + 0x08) - 100,
                                    self.province.Offset + 0x08)
 
         if province.Offset != self.province.Offset:
@@ -138,13 +138,13 @@ class Command5(object):
         else:
             if hired_result == 0:
                 self.Talk(officer_will_hire,
-                          RoTK2.GetOfficerName(officer_will_be_hired.Offset) +
+                          officer_will_be_hired.GetName() +
                           Helper.GetBuiltinText(0x6E93))
             else:
                 self.SetNewOfficerState(province.Offset, officer_will_be_hired, officer_will_hire)
                 self.Talk(officer_will_hire,
                           Helper.GetBuiltinText(0x6E72) +
-                          RoTK2.GetOfficerName(officer_will_be_hired.Offset) +
+                          officer_will_be_hired.GetName() +
                           Helper.GetBuiltinText(0x6E79))
                 Helper.ShowMap(self.province_no)
 
@@ -160,7 +160,7 @@ class Command5(object):
         else:
             officer_will_be_hired.RulerNo = officer_will_hire.RulerNo
             officer_will_be_hired.Loyalty = 0x28
-            ruler = RoTK2.GetRulerByNo(officer_will_be_hired.RulerNo)
+            ruler = Ruler.FromNo(officer_will_be_hired.RulerNo)
             self.SetOfficerLoyal(officer_will_be_hired, ruler.RulerSelf)
             # TODO
             # skip spy operation
@@ -189,7 +189,7 @@ class Command5(object):
             compatibility = 120 - int(diff / 2) - random.randint(0, 10)
         else:
             compatibility = 100 - officer_will_be_hired.Loyalty
-            if RoTK2.IsRuler(officer_will_hire):
+            if officer_will_hire.IsRuler():
                 compatibility = int(1.1 * compatibility)
 
         data = self.GetRelationShip(officer_will_be_hired, officer_will_hire, v_b10c, compatibility)
@@ -200,7 +200,7 @@ class Command5(object):
 
     def GetRelationShip(self, officer_will_be_hired, officer_will_hire, cmd, compatibility):
         data = 0
-        trust = RoTK2.GetRulerByNo(self.province.RulerNo).TrustRating
+        trust = Ruler.FromNo(self.province.RulerNo).TrustRating
 
         if cmd == 0:
             data = officer_will_be_hired.Chm + officer_will_be_hired.Int
@@ -238,7 +238,7 @@ class Command5(object):
         if officer_no < 1:
             return
 
-        officer = self.province.OfficerList[officer_no - 1]
+        officer = self.province.GetOfficerList()[officer_no - 1]
         num1 = int(officer.Int / 3) + int(officer.Chm / 2)
         num2 = random.randint(0, 20)
         magic = num1 - min(num1, num2)
@@ -250,11 +250,11 @@ class Command5(object):
         if continue_seek == 0:
             return
 
-        if magic == 1 or Helper.GetWordFromOffset(Data.BUF, self.province.Offset + 6) == 0:
+        if magic == 1 or Data.GetWordFromOffset(Data.BUF, self.province.Offset + 6) == 0:
             self.Talk(officer, Helper.GetBuiltinText(0x6ECF))
             return
 
-        free_list = Helper.GetProvinceFreeOfficerList(self.province)
+        free_list = self.province.GetFreeOfficerList()
         general = free_list[random.randint(0, len(free_list) - 1)]
         Helper.LinkListRemoveObjectFromOffset(self.province.Offset + 6, general.Offset)
         Helper.LinklistAppendObject(self.province.Offset + 4, general.Offset)
@@ -263,15 +263,15 @@ class Command5(object):
         Data.BUF[general.Offset + 0x0C] = 0
 
         self.ShowOfficer(general)
-        self.Talk(officer, RoTK2.GetOfficerName(general.Offset) + Helper.GetBuiltinText(0x6EB5))
+        self.Talk(officer, general.GetName() + Helper.GetBuiltinText(0x6EB5))
 
     def ShowOfficer(self, officer):
-        bmp = pygame.Surface((330, 150))
+        bmp = pygame.Surface((330, 160))
         bmp.fill((0, 0, 0))
 
         img = Helper.GetFace(officer.Portrait)
         bmp.blit(img, (5, 35))
-        img = Helper.DrawText(RoTK2.GetOfficerName(officer.Offset))
+        img = Helper.DrawText(officer.GetName())
         bmp.blit(img, (85, 95))
 
         bmp = pygame.transform.scale(bmp, (bmp.get_width() * Helper.Scale, bmp.get_height() * Helper.Scale))
@@ -303,18 +303,18 @@ class Command5(object):
 
         bmp = pygame.transform.scale(bmp, (bmp.get_width() * Helper.Scale, bmp.get_height() * Helper.Scale))
 
-        Helper.Screen.blit(bmp, (300 * Helper.Scale, 300 * Helper.Scale))
+        Helper.Screen.blit(bmp, (300 * Helper.Scale, 295 * Helper.Scale))
         pygame.display.flip()
 
         pygame.time.delay(1000)
 
     def AdvisorTalkCalculate(self, magic):
-        advisor = RoTK2.GetAdvisor()
+        advisor = Officer.GetAdvisor()
         if advisor is None:
             return 1
 
         exist_advisor = False
-        for officer in self.province.OfficerList:
+        for officer in self.province.GetOfficerList():
             if officer.Offset == advisor.Offset:
                 exist_advisor = True
                 break
@@ -366,14 +366,14 @@ class Command5(object):
             self.FireAdvisor()
 
     def FireAdvisor(self):
-        advisor = RoTK2.GetAdvisor()
+        advisor = Officer.GetAdvisor()
         if advisor is None:
             Helper.ShowDelayedText(Helper.GetBuiltinText(0x6D22))
             return
 
         Helper.ClearInputArea()
 
-        text = Helper.GetBuiltinText(0x6D2B).replace("%s",RoTK2.GetOfficerName(advisor.Offset))
+        text = Helper.GetBuiltinText(0x6D2B).replace("%s",advisor.GetName())
         text_list = Helper.GetColorTextInformation(text)
         img_width = Helper.RenderColorText(text_list,300*Helper.Scale,300*Helper.Scale)
 
@@ -381,10 +381,10 @@ class Command5(object):
         if yn != "y":
             return
 
-        ruler_offset = Helper.GetWordFromOffset(Data.BUF, Data.CURRENT_RULER_OFFSET)
+        ruler_offset = Data.GetWordFromOffset(Data.BUF, Data.CURRENT_RULER_OFFSET)
         Helper.SetWordToOffset(Data.BUF, 0, ruler_offset + 4)
 
-        Helper.ShowDelayedText(Helper.GetBuiltinText(0x6D46).replace("%s", RoTK2.GetOfficerName(advisor.Offset)),
+        Helper.ShowDelayedText(Helper.GetBuiltinText(0x6D46).replace("%s", advisor.GetName()),
                                top=330, palette_no=7)
 
         Helper.ShowMap(self.province_no)
@@ -401,9 +401,9 @@ class Command5(object):
             if self.CanFireOfficer(province_no) is False:
                 continue
 
-            province = RoTK2.GetProvinceBySequence(province_no)
+            province = Province.FromSequence(province_no)
 
-            show_governor = not (RoTK2.GetCurrentRulerOfficerOffset() == province.OfficerList[0].Offset)
+            show_governor = not (Helper.GetCurrentRulerOfficerOffset() == province.GetOfficerList()[0].Offset)
             while True:
                 officer_no = Helper.SelectOfficer(province_no, Helper.GetBuiltinText(0x6CEE), ShowOfficerFlag.Loyalty,
                                                   show_governor=show_governor, check_can_action=False)
@@ -416,26 +416,26 @@ class Command5(object):
             if self.ConfirmFireOfficer(province,officer_no) is False:
                 continue
 
-            officer = province.OfficerList[officer_no - 1]
+            officer = province.GetOfficerList()[officer_no - 1]
 
             # remove officer
             officer.Soldiers = 0
             officer.Loyalty = 0
             officer.Weapons = 0
-            RoTK2.FlushOfficer(officer)
+            officer.Flush()
 
-            Helper.ShowDelayedText(RoTK2.GetOfficerName(officer.Offset) + Helper.GetBuiltinText(0x6D15, 0x6D1C))
+            Helper.ShowDelayedText(officer.GetName() + Helper.GetBuiltinText(0x6D15, 0x6D1C))
 
-            province.OfficerList.pop(officer_no - 1)
+            province.GetOfficerList().pop(officer_no - 1)
 
             Helper.LinkListRemoveObjectFromOffset(province.Offset+2, officer.Offset)
 
             num = min(0x7530, int((officer.Soldiers + province.Population) / 100))
             province.Population = num * 100
 
-            RoTK2.FlushProvince(province)
+            province.Flush()
 
-            if len(province.OfficerList)==0:
+            if len(province.GetOfficerList())==0:
                 # empty province now.
                 Helper.SetWordToOffset(Data.BUF,0,province.Offset+2)
                 Data.BUF[province.Offset + 0x10] = 0xFF
@@ -443,26 +443,26 @@ class Command5(object):
                 Data.BUF[province.Offset + 0x14] = 0xFF
                 Data.BUF[province.Offset + 0x15] = 0xFF
 
-                ruler_offset = Helper.GetWordFromOffset(Data.BUF,Data.CURRENT_RULER_OFFSET)
+                ruler_offset = Data.GetWordFromOffset(Data.BUF,Data.CURRENT_RULER_OFFSET)
                 Helper.LinkListRemoveObjectFromOffset(ruler_offset+2,province.Offset)
 
                 Helper.MainMap = Helper.GetMap()
                 pygame.display.flip()
             else:
-                if len(province.OfficerList)==1:
-                    governor = province.OfficerList[0]
+                if len(province.GetOfficerList())==1:
+                    governor = province.GetOfficerList()[0]
                 else:
-                    if RoTK2.GetProvinceDelegateStatus(province_no)>0:
-                        governor = sorted(province.OfficerList,key=lambda x:x.Loyalty,reverse=True)[0]
+                    if Helper.GetProvinceDelegateStatus(province_no)>0:
+                        governor = sorted(province.GetOfficerList(),key=lambda x:x.Loyalty,reverse=True)[0]
                     else:
                         while True:
-                            officer_no = Helper.SelectOfficer(province_no, Helper.GetBuiltinText(0x3F75).replace("%s",RoTK2.GetOfficerName(RoTK2.GetCurrentRulerOfficerOffset())).replace("%2d",str(province_no)),
+                            officer_no = Helper.SelectOfficer(province_no, Helper.GetBuiltinText(0x3F75).replace("%s",Officer.GetName(Helper.GetCurrentRulerOfficerOffset())).replace("%2d",str(province_no)),
                                                               ShowOfficerFlag.Loyalty,show_governor=False,check_can_action=False)
                             if officer_no>0:
                                 break
 
-                        governor = province.OfficerList[officer_no-2]
-                        province.OfficerList.pop(officer_no-2)
+                        governor = province.GetOfficerList()[officer_no-2]
+                        province.GetOfficerList().pop(officer_no-2)
 
                 Helper.SetWordToOffset(Data.BUF,province.Offset+2,officer.Offset)
 
@@ -473,12 +473,12 @@ class Command5(object):
                 neighbor = random.randint(0, len(neighbors) - 1)
                 if neighbors[neighbor]<256:
                     break
-            neighbor_province = RoTK2.GetProvinceBySequence(neighbors[neighbor])
+            neighbor_province = Province.FromSequence(neighbors[neighbor])
             Helper.LinklistAppendObject(neighbor_province.Offset + 6, officer.Offset)
 
 
     def ConfirmFireOfficer(self,province,officer_no):
-        text = Helper.GetBuiltinText(0x6CF7).replace("%s",RoTK2.GetOfficerName(province.OfficerList[officer_no - 1].Offset))
+        text = Helper.GetBuiltinText(0x6CF7).replace("%s",province.GetOfficerList()[officer_no - 1].GetName())
         text_list = Helper.GetColorTextInformation(text)
         img_width = Helper.RenderColorText(text_list,300*Helper.Scale,330*Helper.Scale)
 
@@ -490,10 +490,10 @@ class Command5(object):
         if province_no < 1:
             can_fire_officer = False
 
-        if Helper.Is2ProvincesAreSameRuler(self.province_no, province_no) is False:
+        if Province.Is2ProvincesBelongToSameRuler(self.province_no, province_no) is False:
             can_fire_officer = False
 
-        province = RoTK2.GetProvinceBySequence(province_no)
+        province = Province.FromSequence(province_no)
         if province.WarRulerNo != 0xFF:
             can_fire_officer = False
 
@@ -504,17 +504,17 @@ class Command5(object):
         if province_no < 1:
             can_assign_governor = False
 
-        if Helper.Is2ProvincesAreSameRuler(self.province_no, province_no) is False:
+        if Province.Is2ProvincesBelongToSameRuler(self.province_no, province_no) is False:
             can_assign_governor = False
 
-        province = RoTK2.GetProvinceBySequence(province_no)
+        province = Province.FromSequence(province_no)
         if province.WarRulerNo != 0xFF:
             can_assign_governor = False
 
         if province_no==self.province_no:
             can_assign_governor = False
 
-        if len(province.OfficerList)==1:
+        if len(province.GetOfficerList())==1:
             can_assign_governor = False
 
         return can_assign_governor
@@ -530,7 +530,7 @@ class Command5(object):
             if self.CanAssignGovernor(province_no) is False:
                 continue
 
-            province = RoTK2.GetProvinceBySequence(province_no)
+            province = Province.FromSequence(province_no)
             while True:
                 officer_no = Helper.SelectOfficer(province_no, Helper.GetBuiltinText(0x6D9A), ShowOfficerFlag.Loyalty,check_can_action=False)
                 if officer_no >= 0:
@@ -539,26 +539,26 @@ class Command5(object):
             if officer_no == 0:
                 continue
 
-            officer = province.OfficerList[officer_no - 1]
-            province.OfficerList.pop(officer_no-1)
+            officer = province.GetOfficerList()[officer_no - 1]
+            province.GetOfficerList().pop(officer_no-1)
 
-            Helper.SetWordToOffset(Data.BUF,province.OfficerList[0].Offset,officer.Offset)
-            for i in range(0,len(province.OfficerList)-1):
-                Helper.SetWordToOffset(Data.BUF, province.OfficerList[i+1].Offset, province.OfficerList[i].Offset)
-            Helper.SetWordToOffset(Data.BUF, 0, province.OfficerList[i+1].Offset)
+            Helper.SetWordToOffset(Data.BUF,province.GetOfficerList()[0].Offset,officer.Offset)
+            for i in range(0,len(province.GetOfficerList())-1):
+                Helper.SetWordToOffset(Data.BUF, province.GetOfficerList()[i+1].Offset, province.GetOfficerList()[i].Offset)
+            Helper.SetWordToOffset(Data.BUF, 0, province.GetOfficerList()[i+1].Offset)
 
             Helper.SetWordToOffset(Data.BUF, officer.Offset,province.Offset + 2)
-            Helper.ShowDelayedText(RoTK2.GetOfficerName(officer.Offset)+Helper.GetBuiltinText(0x6DE4,0x6DE7)+Helper.GetBuiltinText(0x6DD0))
+            Helper.ShowDelayedText(officer.GetName()+Helper.GetBuiltinText(0x6DE4,0x6DE7)+Helper.GetBuiltinText(0x6DD0))
 
     def CanAssignAdvisor(self,province_no):
         can_assign_advisor = True
         if province_no < 1:
             can_assign_advisor = False
 
-        if Helper.Is2ProvincesAreSameRuler(self.province_no, province_no) is False:
+        if Province.Is2ProvincesBelongToSameRuler(self.province_no, province_no) is False:
             can_assign_advisor = False
 
-        province = RoTK2.GetProvinceBySequence(province_no)
+        province = Province.FromSequence(province_no)
         if province.WarRulerNo != 0xFF:
             can_assign_advisor = False
 
@@ -566,14 +566,14 @@ class Command5(object):
     def AssignAdvisor(self):
         Helper.ClearInputArea()
 
-        advisor = RoTK2.GetAdvisor()
+        advisor = Officer.GetAdvisor()
         if advisor is None:
             img = Helper.DrawText(Helper.GetBuiltinText(0x6E55),scaled=True)
             img = pygame.transform.scale(img,(img.get_width()*Helper.Scale,img.get_height()*Helper.Scale))
             Helper.Screen.blit(img, (300*Helper.Scale, 300*Helper.Scale))
             pygame.display.flip()
         else:
-            text = Helper.GetBuiltinText(0x6E3D).replace("%s",RoTK2.GetOfficerName(advisor.Offset))
+            text = Helper.GetBuiltinText(0x6E3D).replace("%s",advisor.GetName())
             text_list = Helper.GetColorTextInformation(text)
             Helper.RenderColorText(text_list,300*Helper.Scale,300*Helper.Scale)
 
@@ -587,7 +587,7 @@ class Command5(object):
             if self.CanAssignAdvisor(province_no) is False:
                 continue
 
-            province = RoTK2.GetProvinceBySequence(province_no)
+            province = Province.FromSequence(province_no)
             while True:
                 officer_no = Helper.SelectOfficer(province_no, Helper.GetBuiltinText(0x6DA7), ShowOfficerFlag.Int,check_can_action=False)
                 if officer_no >= 0:
@@ -596,13 +596,13 @@ class Command5(object):
             if officer_no == 0:
                 continue
 
-            officer = province.OfficerList[officer_no - 1]
+            officer = province.GetOfficerList()[officer_no - 1]
             if officer.Int<80:
                 Helper.ShowDelayedText(Helper.GetBuiltinText(0x6DB4))
                 return
 
-            RoTK2.SetAdvisor(officer)
-            text = Helper.GetBuiltinText(0x6DDA,0x6DE7).replace("%s",RoTK2.GetOfficerName(officer.Offset))+Helper.GetBuiltinText(0x6DD5)
+            officer.SetAdvisor()
+            text = Helper.GetBuiltinText(0x6DDA,0x6DE7).replace("%s",officer.GetName())+Helper.GetBuiltinText(0x6DD5)
             text_list = Helper.GetColorTextInformation(text)
             Helper.RenderColorText(text_list,300*Helper.Scale,330*Helper.Scale)
             pygame.time.wait(1000)

@@ -1,9 +1,3 @@
-import configparser
-from collections.abc import Mapping, Sequence
-from enum import Enum
-from Province import Province
-from Officer import Officer
-
 class GameStatus():
     ShowLogo = 1
     DisplayMenu = 2
@@ -51,6 +45,9 @@ class Data(object):
     NAME16P = None
     CHARACTER = None
     LOGOTEXT = None
+    ASCII_FONT = None
+    ASCII_FONT2 = None
+    ASCII_FONT3 = None
     CNINDEX = {}
     MaxNumberOfGenerals = 255
     BUF = None
@@ -60,29 +57,25 @@ class Data(object):
 
     SettingsFileName = "settings.txt"
     DATA_OFFSET = 0x38
+
     PROVINCE_START = 0x2D8C+DATA_OFFSET
     PROVINCE_SIZE = 0x23
+
     RULER_START = 0x2AFC+DATA_OFFSET
     RULER_SIZE = 0x29
 
-    OFFSET = 0x38
-    OFFICER_OFFSET = 0x20+OFFSET
+    OFFICER_START = 0x20 + DATA_OFFSET
     OFFICER_SIZE = 0x2B
-    PROVINCE_OFFSET = 0X2D8C+OFFSET
-    PROVINCE_SIZE = 0x23
-    RULER_OFFSET = 0x2AFC+OFFSET
-    RULER_SIZE = 0x29
-    CURRENT_RULER_OFFSET = 0x335c+OFFSET
-    CURRENT_RULER_OFFICER_OFFSET = 0x335e + OFFSET
-    CURRENT_PROVINCE_OFFSET = 0x3362+OFFSET
-    GAME_DIFFCULTY_OFFSET = 0x337B + OFFSET
+
+    CURRENT_RULER_OFFSET = 0x335c+DATA_OFFSET
+    CURRENT_RULER_OFFICER_OFFSET = 0x335e + DATA_OFFSET
+    CURRENT_PROVINCE_OFFSET = 0x3362+DATA_OFFSET
+    GAME_DIFFCULTY_OFFSET = 0x337B + DATA_OFFSET
     GAME_DIFFCULTY = 1
     NUMBER_OF_RULERS = 0
-    NUMBER_OF_RULERS_OFFSET = 0x47 + OFFSET
-    OfficerList = Sequence[Province]
-    ProvinceList = Sequence[Province]
-    RULER_AS_OFFICER_OFFSET = 0x2ACA + OFFSET
-    FOLLOWER_OFFSET = 0x2A9F + OFFSET
+    NUMBER_OF_RULERS_OFFSET = 0x47 + DATA_OFFSET
+    RULER_AS_OFFICER_OFFSET = 0x2ACA + DATA_OFFSET
+    FOLLOWER_OFFSET = 0x2A9F + DATA_OFFSET
     PROVINCE_DESC = None
 
     RulerPalette = []
@@ -130,6 +123,9 @@ class Data(object):
         DSBUF = list(f.read())
         for i in range(0,6):
             DSBUF[0xAFF6+i] = i
+
+    with open(GamePath+"ascii.fnt","rb") as f:
+        ASCII_FONT = list(f.read())
 
     with open(GamePath + "province.des", "rb") as f:
         tmp = bytearray(f.read(833))
@@ -188,14 +184,17 @@ class Data(object):
             else:
                 i+=1
 
-            with open(GamePath + "h.bin", "rb") as f:
-                tmp_buf = f.read(0x58)
+    with open(GamePath + "h.bin", "rb") as f:
+        tmp_buf = f.read(0x58)
 
-            with open(GamePath + "s1", "rb") as f:
-                tmp_buf2 = f.read(30752)
+    with open(GamePath + "s1", "rb") as f:
+        tmp_buf2 = f.read(30752)
 
-            BUF = bytearray(tmp_buf) + bytearray(tmp_buf2)[0x20:]
-            RulerPalette = bytearray(tmp_buf2)[0x10:0x20]
+    BUF = bytearray(tmp_buf) + bytearray(tmp_buf2)[0x20:]
+    RulerPalette = bytearray(tmp_buf2)[0x10:0x20]
+
+    GAME_DIFFCULTY = int(BUF[GAME_DIFFCULTY_OFFSET])
+    NUMBER_OF_RULERS = int(BUF[NUMBER_OF_RULERS_OFFSET])
 
     MapIndex = [[0, 0, 0, 0, 0, 2, 1, 0],
                       [0, 0, 0, 4, 3, 6, 0, 0],
@@ -232,5 +231,14 @@ class Data(object):
         "Rain": [0x8d2a, 0x1f0, 0x28],
         "WarMenu": [0x8f52,0x1a0, 0x0],
     }
+
+    @staticmethod
+    def GetWordFromOffset(buf, offset):
+        return buf[offset + 1] * 256 + buf[offset]
+
+    @staticmethod
+    def SetWordToOffset(buf, word, offset):
+        buf[offset + 1] = word >> 8
+        buf[offset + 0] = word % 256
 
 

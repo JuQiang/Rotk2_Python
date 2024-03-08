@@ -2,9 +2,7 @@ import os.path
 
 from Data import Data
 import pygame,sys
-from Helper import Helper
-from RoTK2 import RoTK2
-from Src.UI.Draw import Draw
+from Helper import Helper,Province,Officer,Ruler
 
 class MainMenu(object):
     def __init__(self):
@@ -250,7 +248,6 @@ class MainMenu(object):
 
         pygame.display.flip()
 
-        self.draw = Draw(Helper.Scale)
 
     def Start(self):
         #self.printf([0x1b,0x3d,0x25,0x41,0x1b,0x52,0x41,0x31,0x2e,0x9d,0xf5,0x9d,0x45,0xa2,0xba,0xa4,0x41,0xaa,0x82,0x0a,0x0a,0x32,0x2e,0xa3,0xd1,0x92,0xaa,0xa7,0x46,0xa8,0xe2,0x0a,0x0a,0x33,0x2e,0xa1,0x4e,0x95,0xd5,0x00])
@@ -321,14 +318,12 @@ class MainMenu(object):
 
         for i in range(len(self.player_list)):
             row_offset = 40+30*int(i/3)
-            img = Helper.DrawText(RoTK2.GetOfficerName(self.player_list[i].RulerSelf.Offset))
-            bmp.blit(img,(100 + 70 * (i % 3),row_offset))
+            img = Helper.DrawText(self.player_list[i].RulerSelf.GetName())
+            bmp.blit(img,(100 + 67 * (i % 3),row_offset))
 
     def SelectPlayers(self, bmp):
-        RoTK2.Init()
-
         limit = [0x0c, 0x0c, 0x09, 0x0b, 0x05, 0x05]
-        ruler_list = RoTK2.GetRulerList()
+        ruler_list = Ruler.GetList()
 
         img = Helper.DrawText(Helper.GetBuiltinText(0x5559),scaled=True,palette_no=0,back_color=(255,255,255))
         Helper.Screen.blit(img, (32*Helper.Scale, 10*Helper.Scale))
@@ -341,7 +336,7 @@ class MainMenu(object):
             page = 0
             while True:
                 Helper.ClearInputArea()
-                img = self.draw.NewGameSelectRuler(self.scenario_no, page, player_list)
+                img = self.NewGameSelectRuler(self.scenario_no, page, player_list)
                 Helper.Screen.blit(img,(295*Helper.Scale,5*Helper.Scale))
                 if limit[self.scenario_no]>6:
                     ruler_no = Helper.GetInput("{2}{0},{3}(0-{1})? ".format(i+1,max_rulers,Helper.GetBuiltinText(0x5299,0x529E),Helper.GetBuiltinText(0x52A3,0x52A8)),next_prompt=Helper.GetBuiltinText(0x52B3),required_number_min=0,required_number_max=max_rulers,allow_enter_exit=False)
@@ -362,7 +357,7 @@ class MainMenu(object):
                 Data.BUF[0x3360+0x0F] = len(player_list)
             else:
                 Data.BUF[0x3360 + ruler_no - 1] = len(player_list)
-            img = self.draw.NewGameSelectRuler(self.scenario_no, page, player_list)
+            img = self.NewGameSelectRuler(self.scenario_no, page, player_list)
             Helper.Screen.blit(img, (295 * Helper.Scale, 5 * Helper.Scale))
 
             print(ruler_no)
@@ -372,8 +367,8 @@ class MainMenu(object):
             self.NewRuler()
             Data.BUF[0x47] = max_rulers
 
-        RoTK2.GetRulersOrder()
-        ruler_list = RoTK2.GetRulerList()
+        Helper.GetRulersOrder()
+        ruler_list = Ruler.GetList()
 
 
         self.ShowScenario(bmp)
@@ -507,31 +502,30 @@ class MainMenu(object):
             if Data.BUF[0x3360+i]==1:
                 break
 
-        off = Data.RULER_OFFSET+i*Data.RULER_SIZE
+        off = Data.RULER_START+i*Data.RULER_SIZE
 
-        Data.BUF[0x335A + Data.OFFSET] = 0  # start from 0
-        Data.BUF[0x335C + Data.OFFSET] = off%256
-        Data.BUF[0x335D + Data.OFFSET] = int(off / 256)
+        Data.BUF[0x335A + Data.DATA_OFFSET] = 0  # start from 0
+        Data.BUF[0x335C + Data.DATA_OFFSET] = off%256
+        Data.BUF[0x335D + Data.DATA_OFFSET] = int(off / 256)
 
         off2 = Data.BUF[off+1]*256+Data.BUF[off]
-        Data.BUF[0x335E + Data.OFFSET] = off2%256
-        Data.BUF[0x335F + Data.OFFSET] = int(off2 / 256)
+        Data.BUF[0x335E + Data.DATA_OFFSET] = off2%256
+        Data.BUF[0x335F + Data.DATA_OFFSET] = int(off2 / 256)
 
         off3 = Data.BUF[off + 3] * 256 + Data.BUF[off+2]
-        Data.BUF[0x3362 + Data.OFFSET] = off3%256
-        Data.BUF[0x3363 + Data.OFFSET] = int(off3/256)
+        Data.BUF[0x3362 + Data.DATA_OFFSET] = off3%256
+        Data.BUF[0x3363 + Data.DATA_OFFSET] = int(off3/256)
 
-        Data.BUF[0x337b+Data.OFFSET] = self.level
+        Data.BUF[0x337b+Data.DATA_OFFSET] = self.level
         option = 0x0
         option |= self.seewar
         if self.history==1:
             option |= 0x80
 
-        Data.BUF[0x337C + Data.OFFSET] = option
-        Data.BUF[0x337D+Data.OFFSET] = 5
-        Data.BUF[0x337E + Data.OFFSET] = 4
+        Data.BUF[0x337C + Data.DATA_OFFSET] = option
+        Data.BUF[0x337D+Data.DATA_OFFSET] = 5
+        Data.BUF[0x337E + Data.DATA_OFFSET] = 4
 
-        RoTK2.Init()
         Helper.MainMap = Helper.GetMap()
 
         return "OK"
@@ -546,7 +540,7 @@ class MainMenu(object):
                 Helper.Screen.blit(img, (350 * Helper.Scale, 360 * Helper.Scale))
 
                 img = Helper.DrawText(Helper.GetBuiltinText(0x57BE,0x57BF)+Helper.GetBuiltinText(0x57B9)+Helper.GetBuiltinText(0x57C2), scaled=True, palette_no=7)
-                Helper.Screen.blit(img, (300 * Helper.Scale, 298 * Helper.Scale))
+                Helper.Screen.blit(img, (300 * Helper.Scale, 295 * Helper.Scale))
 
                 Helper.ClearInputArea(1)
                 name = Helper.GetInput("",350, 345,width=200,palette_no=1,required_number=False,max_chars=6)
@@ -680,7 +674,7 @@ class MainMenu(object):
             Helper.ClearInputArea()
             pno = Helper.GetInput(Helper.GetBuiltinText(0x54A8)+"(1-41)? ", required_number_min=1, required_number_max=41,
                                   allow_enter_exit=False)
-            rno = RoTK2.GetProvinceBySequence(pno).RulerNo
+            rno = Province.FromSequence(pno).RulerNo
             if rno == 255:
                 break
 
@@ -705,7 +699,7 @@ class MainMenu(object):
                     Helper.Screen.blit(img, (350 * Helper.Scale, 350 * Helper.Scale))
 
                     img = Helper.DrawText(Helper.GetBuiltinText(0x57BE,0x57BF)+Helper.GetBuiltinText(0x57B4)+Helper.GetBuiltinText(0x57C2), scaled=True, palette_no=7)
-                    Helper.Screen.blit(img, (300 * Helper.Scale, 298 * Helper.Scale))
+                    Helper.Screen.blit(img, (300 * Helper.Scale, 295 * Helper.Scale))
 
                     name = Helper.GetInput("", 350, 335, width=200, palette_no=1, required_number=False, max_chars=6)
                     yn = Helper.GetInput(Helper.GetBuiltinText(0x57F9)+Helper.GetBuiltinText(0x3D7D)+"(Y/N)? ",keydown_mode=True)
@@ -737,7 +731,7 @@ class MainMenu(object):
             Helper.Screen.blit(img, (400 * Helper.Scale, 250 * Helper.Scale))
             return None
 
-        follower_offset = 0x2A9F + Data.OFFSET
+        follower_offset = 0x2A9F + Data.DATA_OFFSET
         Data.BUF[follower_offset+0x00:follower_offset+0x00+0x2B] = [0]*0x2B
         Data.BUF[follower_offset+0x04] = 50
         Data.BUF[follower_offset + 0x05] = 60
@@ -755,7 +749,7 @@ class MainMenu(object):
         for i in range(0,len(name)):
             Data.BUF[follower_offset+0x1C+i] = ord(name[i])
 
-        follower = RoTK2.GetOfficerFromBuffer(Data.BUF[follower_offset:follower_offset+0x2b].copy(),253,Data.BUF[0x45] * 256 + Data.BUF[0x44] + 1)
+        follower = Officer.FromBuffer(Data.BUF[follower_offset:follower_offset+0x2b].copy(),253,Data.GetWordFromOffset(Data.BUF,0x44))
 
         return follower
 
@@ -821,7 +815,7 @@ class MainMenu(object):
             Data.BUF[Data.RULER_AS_OFFICER_OFFSET + 0x00] = follower.Offset%256
             Data.BUF[Data.RULER_AS_OFFICER_OFFSET + 0x01] = int(follower.Offset / 256)
 
-        province_offset = Data.PROVINCE_OFFSET+Data.PROVINCE_SIZE*(pno-1)
+        province_offset = Data.PROVINCE_START+Data.PROVINCE_SIZE*(pno-1)
         Data.BUF[province_offset + 0x02 ] = Data.RULER_AS_OFFICER_OFFSET % 256
         Data.BUF[province_offset + 0x03 ] = int(Data.RULER_AS_OFFICER_OFFSET / 256)
         Data.BUF[province_offset + 0x08] = 0xd0
@@ -834,7 +828,7 @@ class MainMenu(object):
         Data.BUF[province_offset + 0x10 ] = 0x0F
         Data.BUF[province_offset + 0x17] = 65
 
-        ruler_offset = Data.RULER_OFFSET+Data.RULER_SIZE*0x0F
+        ruler_offset = Data.RULER_START+Data.RULER_SIZE*0x0F
         Data.BUF[ruler_offset + 0x00] = Data.RULER_AS_OFFICER_OFFSET % 256
         Data.BUF[ruler_offset + 0x01] = int(Data.RULER_AS_OFFICER_OFFSET / 256)
         Data.BUF[ruler_offset + 0x02] = province_offset % 256
@@ -891,11 +885,10 @@ class MainMenu(object):
 
                 tmp_buf = Data.DSBUF[0:0x42]
                 with open(Data.GamePath + file_name, "rb") as f:
-                    tmp_buf2 = f.read(30584)
+                    tmp_buf2 = f.read()
 
                 Data.BUF = bytearray(tmp_buf) + bytearray(tmp_buf2)[0x0A:]
                 Data.RulerPalette = bytearray(tmp_buf2)[0x10:0x20]
-                RoTK2.Init()
 
                 return "OK"
             else:
@@ -906,3 +899,55 @@ class MainMenu(object):
                 Helper.Screen.blit(bmp, (250 * Helper.Scale, 180 * Helper.Scale))
 
                 Helper.GetInput(Helper.GetBuiltinText(0x590C), 250, 210, width=200)
+
+    def NewGameSelectRuler(self, no, page, player_list):
+            limit = [0x0c, 0x0c, 0x09, 0x0b, 0x05, 0x05]
+            bmp = pygame.Surface((336, 280))
+            bmp.fill((0, 0, 0))
+
+            ruler_list = Ruler.GetList()
+            left = 30
+            top = 20
+
+            width = 64 + 2
+            height = 80 + 2
+
+            max_rulers = min(limit[no], 6 * (page + 1))
+            for i in range(6 * page, max_rulers):
+                border_coords = (
+                    (left + 110 * int(i % 3), top + 140 * int(i % 6 / 3)),
+                    (left + 110 * int(i % 3) + width, top + 140 * int(i % 6 / 3)),
+                    (left + 110 * int(i % 3) + width, top + 140 * int(i % 6 / 3) + height),
+                    (left + 110 * int(i % 3), top + 140 * int(i % 6 / 3) + height)
+                )
+                pygame.draw.lines(bmp, Helper.Palettes[6], True, border_coords, 1)
+
+                if i != limit[no] - 1:
+                    face_bmp = Helper.GetFace(ruler_list[i].RulerSelf.Portrait)
+                    bmp.blit(face_bmp, (left + 1 + 110 * int((i % 3)), top + 1 + 140 * int(i % 6 / 3)))
+
+                back_color = Helper.RulerPalettes[Data.BUF[0x48 + i]]
+                pygame.draw.rect(bmp, back_color, (
+                left + 2 + 110 * int((i % 3)), top + 5 + height + 140 * int(i % 6 / 3), 8 * Helper.Scale,
+                14 * Helper.Scale))
+
+                fname = "inaimathimn"
+                f = pygame.font.SysFont(fname, 24)
+                num = f.render(str(i + 1), True, (0, 0, 0), back_color)
+                if num.get_width() == 11 and num.get_height() == 30:
+                    num = num.subsurface((1, 7, 9, 14)).copy()
+                num = pygame.transform.scale(num, (8, 14 * Helper.Scale))
+                bmp.blit(num, (left + 6 + 110 * int((i % 3)), top + 5 + height + 140 * int(i % 6 / 3)))
+
+                if i != limit[no] - 1:
+                    name_indexes = ruler_list[i].RulerSelf.GetName()
+                else:
+                    name_indexes = Helper.GetBuiltinText(0x5114)
+
+                palette_no = 7
+                if i in player_list:
+                    palette_no = 4
+                name_bmp = Helper.DrawText("{0}".format(name_indexes), scaled=False, palette_no=palette_no)
+                bmp.blit(name_bmp, (left + 20 + 110 * int((i % 3)), top + 5 + height + 140 * int(i % 6 / 3)))
+
+            return pygame.transform.scale(bmp, (bmp.get_width() * Helper.Scale, bmp.get_height() * Helper.Scale))

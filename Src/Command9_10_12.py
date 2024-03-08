@@ -1,8 +1,7 @@
 import pygame.time
 import math
 from Data import Data,ShowOfficerFlag
-from Helper import Helper
-from RoTK2 import RoTK2
+from Helper import Helper,Province,Officer,Ruler
 
 class Command9_10_12(object):
     def __init__(self,prompt,resources,result,show_flag,cost_field,affected_field,max_cost):
@@ -15,7 +14,7 @@ class Command9_10_12(object):
         self.max_cost = max_cost
 
     def Start(self,province_no):
-        province = RoTK2.GetProvinceBySequence(province_no)
+        province = Province.FromSequence(province_no)
 
         resources = int(province.__getattribute__(self.cost_field))
         if resources < 1:
@@ -36,7 +35,7 @@ class Command9_10_12(object):
 
             affect_resource = int(province.__getattribute__(self.affected_field))
             max_cost = min(resources,self.max_cost)
-            really_cost = Helper.GetInput(self.resources +"(1-{0})?".format(max_cost), row=1,cursor_user_prompt_location=True,required_number_min=1,required_number_max=max_cost)
+            really_cost = Helper.GetInput(self.resources +"(1-{0})? ".format(max_cost), row=1,cursor_user_prompt_location=True,required_number_min=1,required_number_max=max_cost)
             if really_cost>0:
                 province.__setattr__(self.cost_field,resources-int(really_cost))
 
@@ -50,7 +49,7 @@ class Command9_10_12(object):
                     affect = 100
                 province.__setattr__(self.affected_field,affect)
 
-                RoTK2.FlushProvince(province)
+                province.Flush()
 
                 if diff<1:
                     if self.cost_field == "Gold":
@@ -68,7 +67,7 @@ class Command9_10_12(object):
                 pygame.time.wait(1000)
 
     def game_development_land_flood_calc(self,province_no, general_no, gold, land_flood):
-        p = RoTK2.GetProvinceBySequence(province_no)
+        p = Province.FromSequence(province_no)
 
         if land_flood=="Land":
             value = p.Land
@@ -84,31 +83,31 @@ class Command9_10_12(object):
         dif = int((Data.GAME_DIFFCULTY + 1) / 2)
         v2 = int(math.sqrt(int(v1 / dif))) - dif
 
-        RoTK2.SetOfficerAlreadyDoAction(o)
+        o.SetActionStatus()
         return v2
 
     def game_give_population_calc(self,province_no,general_no,food):
-        p = RoTK2.GetProvinceBySequence(province_no)
+        p = Province.FromSequence(province_no)
         if p.Loyalty==100:
             return 0
 
-        r = RoTK2.GetRulerByNo(p.RulerNo).RulerSelf
+        r = Ruler.FromNo(p.RulerNo).RulerSelf
         o = p.GetOfficerBySequence(general_no)
 
         v1 = int(math.sqrt(food)) * int((r.Chm+o.Chm)/2)
         v2 = (6+Data.GAME_DIFFCULTY)*int(math.sqrt(p.Population/100))
 
-        RoTK2.SetOfficerAlreadyDoAction(o)
+        o.SetActionStatus()
 
         return int(v1/v2)
 class Command9(Command9_10_12):
     def __init__(self):
-        super().__init__(Helper.GetBuiltinText(0x7A41),Helper.GetBuiltinText(0x7A4E),Helper.GetBuiltinText(0x7A6C,0x7A79),ShowOfficerFlag.Int,"Gold","Land",100)
+        super().__init__(Helper.GetBuiltinText(0x7A41),Helper.GetBuiltinText(0x7A4F),Helper.GetBuiltinText(0x7A6C,0x7A79),ShowOfficerFlag.Int,"Gold","Land",100)
 
 class Command10(Command9_10_12):
     def __init__(self):
-        super().__init__(Helper.GetBuiltinText(0x7AD0),Helper.GetBuiltinText(0x7A4E),Helper.GetBuiltinText(0x7AFB,0x7B06),ShowOfficerFlag.Int,"Gold","Flood",100)
+        super().__init__(Helper.GetBuiltinText(0x7AD0),Helper.GetBuiltinText(0x7A4F),Helper.GetBuiltinText(0x7AFB,0x7B06),ShowOfficerFlag.Int,"Gold","Flood",100)
 
 class Command12(Command9_10_12):
     def __init__(self):
-        super().__init__(Helper.GetBuiltinText(0x7CF5),Helper.GetBuiltinText(0x7CFE),Helper.GetBuiltinText(0x7D14,0x7D20),ShowOfficerFlag.Chm,"Food","Loyalty",10000)
+        super().__init__(Helper.GetBuiltinText(0x7CF5),Helper.GetBuiltinText(0x7CFF),Helper.GetBuiltinText(0x7D14,0x7D20),ShowOfficerFlag.Chm,"Food","Loyalty",10000)

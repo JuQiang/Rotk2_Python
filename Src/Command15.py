@@ -2,8 +2,8 @@ import os.path
 
 from Data import Data
 import pygame,sys
-from Helper import Helper
-from RoTK2 import RoTK2
+from Helper import Helper,Province,Officer,Ruler
+
 from Data import DelegateMode
 
 class Command15(object):
@@ -11,19 +11,19 @@ class Command15(object):
         pass
 
     def Start(self,province_no):
-        bmp = pygame.Surface((330,150))
+        bmp = pygame.Surface((330,160))
         bmp.fill((0,0,0))
 
-        descriptions = Data.PROVINCE_DESC[RoTK2.GetProvinceBySequence(province_no).NameIndex]
+        descriptions = Data.PROVINCE_DESC[Province.FromSequence(province_no).NameIndex]
         for i in range(0,len(descriptions)):
             img = Helper.DrawText(descriptions[i])
             bmp.blit(img,(10,30+30*i))
 
-        start = 0x33b9 + Data.OFFSET + 156 * province_no
+        start = 0x33b9 + Data.DATA_OFFSET + 156 * province_no
         map_data = Data.BUF[start:start + 12 * 13]
 
-        x = 200
-        y = 25
+        x = 210
+        y = 30
         start = 0
         for r in range(0, 12):
             for c in range(0, 13):
@@ -34,8 +34,8 @@ class Command15(object):
 
                 start += 1
 
-        x = 210
-        y = -5
+        x = 220
+        y = 0
         neighbors = Helper.GetNeighbors(province_no)
         for i in range(0,6):
             p = neighbors[i]
@@ -48,7 +48,7 @@ class Command15(object):
 
         Helper.ClearInputArea()
         img = Helper.DrawText(Helper.GetBuiltinText(0x8394))
-        Helper.Screen.blit(img, (300 * Helper.Scale, 300 * Helper.Scale))
+        Helper.Screen.blit(img, (300 * Helper.Scale, 295 * Helper.Scale))
         pygame.display.flip()
 
         Helper.GetInput(Helper.GetBuiltinText(0x8394))

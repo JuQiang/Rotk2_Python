@@ -1,20 +1,20 @@
 import pygame.time
 
 from Data import Data,ShowOfficerFlag
-from Helper import Helper
-from RoTK2 import RoTK2
+from Helper import Helper,Province,Officer,Ruler
+
 
 class Command2(object):
     def __init__(self):
         pass
 
     def Start(self,province_no):
-        province = RoTK2.GetProvinceBySequence(province_no)
+        province = Province.FromSequence(province_no)
         Helper.ClearInputArea()
 
         if province.Gold<1 and province.Food<1:
             img = Helper.DrawText(Helper.GetBuiltinText("0x6A2C"),scaled=True,palette_no=6)
-            Helper.Screen.blit(img,(300*Helper.Scale,298*Helper.Scale))
+            Helper.Screen.blit(img,(300*Helper.Scale,295*Helper.Scale))
             pygame.time.wait(1000)
             return
 

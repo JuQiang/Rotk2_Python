@@ -2,9 +2,8 @@ import os.path
 
 from Data import Data
 import pygame,sys
-from Helper import Helper
-from RoTK2 import RoTK2
-from Src.UI.Draw import Draw
+from Helper import Helper,Province,Officer,Ruler
+
 
 class Command19(object):
     def __init__(self):
@@ -29,32 +28,32 @@ class Command19(object):
                 if tmp==1:
                     Helper.ClearInputArea()
                     img = Helper.DrawText(Helper.GetBuiltinText(0x8B02,0x8B17),scaled=True)
-                    Helper.Screen.blit(img, (300* Helper.Scale, 298 * Helper.Scale))
+                    Helper.Screen.blit(img, (300* Helper.Scale, 295 * Helper.Scale))
 
-                    img2 = Helper.DrawText(str(int(Data.BUF[0x337D+Data.OFFSET])),palette_no=1,scaled=True)
-                    Helper.Screen.blit(img2,((300+int(img.get_width()/Helper.Scale))*Helper.Scale,298*Helper.Scale))
+                    img2 = Helper.DrawText(str(int(Data.BUF[0x337D+Data.DATA_OFFSET])),palette_no=1,scaled=True)
+                    Helper.Screen.blit(img2,((300+int(img.get_width()/Helper.Scale))*Helper.Scale,295*Helper.Scale))
                     tmp = Helper.GetInput(Helper.GetBuiltinText(0x8AF8)+"(1-10)? ",cursor_user_prompt_location=True,row=1,required_number_min=1,required_number_max=10)
                     if tmp>0:
-                        Data.BUF[0x337D+Data.OFFSET] = tmp
+                        Data.BUF[0x337D+Data.DATA_OFFSET] = tmp
                 elif tmp==2:
                     Helper.ClearInputArea()
                     options_text = [Helper.GetBuiltinText(0x8ABA),Helper.GetBuiltinText(0x8AC1),Helper.GetBuiltinText(0x8AC6),Helper.GetBuiltinText(0x8ACB)]
-                    option = int(Data.BUF[0x337E+Data.OFFSET] / 2)
+                    option = int(Data.BUF[0x337E+Data.DATA_OFFSET] / 2)
 
                     Helper.ShowCommandsInInputArea(options_text,4,palette_no=3,top=32)
 
                     img = Helper.DrawText(Helper.GetBuiltinText(0x8AD0,0x8AD9),scaled=True)
-                    Helper.Screen.blit(img,(300*Helper.Scale,298*Helper.Scale))
+                    Helper.Screen.blit(img,(300*Helper.Scale,295*Helper.Scale))
 
                     img2 = Helper.DrawText("<"+options_text[option]+">",palette_no=1,scaled=True)
-                    Helper.Screen.blit(img2,((300+int(img.get_width()/Helper.Scale))*Helper.Scale,298*Helper.Scale))
+                    Helper.Screen.blit(img2,((300+int(img.get_width()/Helper.Scale))*Helper.Scale,295*Helper.Scale))
 
                     tmp = Helper.GetInput(Helper.GetBuiltinText(0x8AF8)+"(1-4)? ",cursor_user_prompt_location=True,row=2,required_number_min=1,required_number_max=4)
                     if tmp>0:
-                        Data.BUF[0x337E+Data.OFFSET] = tmp*2-2
+                        Data.BUF[0x337E+Data.DATA_OFFSET] = tmp*2-2
 
             if cmd==2:
-                option = Data.BUF[0x337C+Data.OFFSET]
+                option = Data.BUF[0x337C+Data.DATA_OFFSET]
                 if option & 0x04 == 0x04:
                     pic = Helper.GetBuiltinText(0x8A89)
                 else:
@@ -63,18 +62,18 @@ class Command19(object):
 
                 Helper.ClearInputArea()
                 img = Helper.DrawText(Helper.GetBuiltinText(0x8A94,0x8A9B).replace("%s",Helper.GetBuiltinText(0x8A7A)),scaled=True)
-                Helper.Screen.blit(img, (300* Helper.Scale, 298 * Helper.Scale))
+                Helper.Screen.blit(img, (300* Helper.Scale, 295 * Helper.Scale))
 
                 img2 = Helper.DrawText(pic,palette_no=1,scaled=True)
-                Helper.Screen.blit(img2,((300+int(img.get_width()/Helper.Scale))*Helper.Scale,298*Helper.Scale))
+                Helper.Screen.blit(img2,((300+int(img.get_width()/Helper.Scale))*Helper.Scale,295*Helper.Scale))
                 tmp = Helper.GetInput(Helper.GetBuiltinText(0x8AA9)+"(1-2)? ",cursor_user_prompt_location=True,row=1,required_number_min=1,required_number_max=10)
                 if tmp==1:
-                    Data.BUF[0x337C+Data.OFFSET] |= 0x04
+                    Data.BUF[0x337C+Data.DATA_OFFSET] |= 0x04
                 elif tmp==2:
-                    Data.BUF[0x337C+Data.OFFSET] &= 0xfb
+                    Data.BUF[0x337C+Data.DATA_OFFSET] &= 0xfb
 
             if cmd==3:
-                option = Data.BUF[0x337C+Data.OFFSET]
+                option = Data.BUF[0x337C+Data.DATA_OFFSET]
                 if option & 0x02 == 0x02:
                     music = Helper.GetBuiltinText(0x8A89)
                 else:
@@ -83,18 +82,18 @@ class Command19(object):
 
                 Helper.ClearInputArea()
                 img = Helper.DrawText(Helper.GetBuiltinText(0x8A94,0x8A9B).replace("%s",Helper.GetBuiltinText(0x8A7F)),scaled=True)
-                Helper.Screen.blit(img, (300* Helper.Scale, 298 * Helper.Scale))
+                Helper.Screen.blit(img, (300* Helper.Scale, 295 * Helper.Scale))
 
                 img2 = Helper.DrawText(music,palette_no=1,scaled=True)
-                Helper.Screen.blit(img2,((300+int(img.get_width()/Helper.Scale))*Helper.Scale,298*Helper.Scale))
+                Helper.Screen.blit(img2,((300+int(img.get_width()/Helper.Scale))*Helper.Scale,295*Helper.Scale))
                 tmp = Helper.GetInput(Helper.GetBuiltinText(0x8AA9)+"(1-2)? ",cursor_user_prompt_location=True,row=1,required_number_min=1,required_number_max=10)
                 if tmp==1:
-                    Data.BUF[0x337C+Data.OFFSET] |= 0x02
+                    Data.BUF[0x337C+Data.DATA_OFFSET] |= 0x02
                 elif tmp==2:
-                    Data.BUF[0x337C+Data.OFFSET] &= 0xfd
+                    Data.BUF[0x337C+Data.DATA_OFFSET] &= 0xfd
 
             if cmd==4:
-                option = Data.BUF[0x337C+Data.OFFSET]
+                option = Data.BUF[0x337C+Data.DATA_OFFSET]
                 if option & 0x01 == 0x01:
                     music = Helper.GetBuiltinText(0x8A89)
                 else:
@@ -103,15 +102,15 @@ class Command19(object):
 
                 Helper.ClearInputArea()
                 img = Helper.DrawText(Helper.GetBuiltinText(0x8A94,0x8A9B).replace("%s",Helper.GetBuiltinText(0x8A84)),scaled=True)
-                Helper.Screen.blit(img, (300* Helper.Scale, 298 * Helper.Scale))
+                Helper.Screen.blit(img, (300* Helper.Scale, 295 * Helper.Scale))
 
                 img2 = Helper.DrawText(music,palette_no=1,scaled=True)
-                Helper.Screen.blit(img2,((300+int(img.get_width()/Helper.Scale))*Helper.Scale,298*Helper.Scale))
+                Helper.Screen.blit(img2,((300+int(img.get_width()/Helper.Scale))*Helper.Scale,295*Helper.Scale))
                 tmp = Helper.GetInput(Helper.GetBuiltinText(0x8AA9)+"(1-2)? ",cursor_user_prompt_location=True,row=1,required_number_min=1,required_number_max=10)
                 if tmp==1:
-                    Data.BUF[0x337C+Data.OFFSET] |= 0x01
+                    Data.BUF[0x337C+Data.DATA_OFFSET] |= 0x01
                 elif tmp==2:
-                    Data.BUF[0x337C+Data.OFFSET] &= 0xfe
+                    Data.BUF[0x337C+Data.DATA_OFFSET] &= 0xfe
 
             if cmd==5:
                 Helper.ClearInputArea()
@@ -157,7 +156,7 @@ class Command19(object):
                     f.write(bytes(buf))
 
             if cmd==6:
-                option = Data.BUF[0x337C+Data.OFFSET]
+                option = Data.BUF[0x337C+Data.DATA_OFFSET]
                 if option & 0x08 == 0x08:
                     war = Helper.GetBuiltinText(0x8A89)
                 else:
@@ -166,15 +165,15 @@ class Command19(object):
 
                 Helper.ClearInputArea()
                 img = Helper.DrawText(Helper.GetBuiltinText(0x8B64,0x8B6D),scaled=True)
-                Helper.Screen.blit(img, (300* Helper.Scale, 298 * Helper.Scale))
+                Helper.Screen.blit(img, (300* Helper.Scale, 295 * Helper.Scale))
 
                 img2 = Helper.DrawText(war,palette_no=1,scaled=True)
-                Helper.Screen.blit(img2,((300+int(img.get_width()/Helper.Scale))*Helper.Scale,298*Helper.Scale))
+                Helper.Screen.blit(img2,((300+int(img.get_width()/Helper.Scale))*Helper.Scale,295*Helper.Scale))
                 tmp = Helper.GetInput(Helper.GetBuiltinText(0x8AA9)+"(1-2)? ",cursor_user_prompt_location=True,row=1,required_number_min=1,required_number_max=10)
                 if tmp==1:
-                    Data.BUF[0x337C+Data.OFFSET] |= 0x08
+                    Data.BUF[0x337C+Data.DATA_OFFSET] |= 0x08
                 elif tmp==2:
-                    Data.BUF[0x337C+Data.OFFSET] &= 0xf7
+                    Data.BUF[0x337C+Data.DATA_OFFSET] &= 0xf7
 
             if cmd==8:
                 Helper.ClearInputArea()

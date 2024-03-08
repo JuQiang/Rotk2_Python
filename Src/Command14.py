@@ -4,8 +4,8 @@ import random
 
 from Data import Data
 import pygame,sys
-from Helper import Helper
-from RoTK2 import RoTK2
+from Helper import Helper,Province,Officer,Ruler
+
 from Data import DelegateMode
 
 class Command14(object):
@@ -25,7 +25,7 @@ class Command14(object):
             return
 
         #should check governor can do action.
-        province = RoTK2.GetProvinceBySequence(province_no)
+        province = Province.FromSequence(province_no)
         offset = province.Offset
         if Data.BUF[offset+0x13] & 4 == 4:
             Helper.ShowDelayedText(Helper.GetBuiltinText(0x7EA6),palette_no=6)
@@ -33,7 +33,7 @@ class Command14(object):
 
         v1 = int(int(math.sqrt(province.Population/100))/10)
         v1 = max(v1,7)
-        v1 += RoTK2.GetRulerByNo(Helper.GetCurrentRulerNo()).TrustRating
+        v1 += Ruler.FromNo(Ruler.GetActiveNo()).TrustRating
         v1 += province.Loyalty
 
         v2 = random.randint(1,0x385)

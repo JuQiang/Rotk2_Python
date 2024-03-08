@@ -4,8 +4,7 @@ import random
 
 from Data import Data, ShowOfficerFlag
 import pygame,sys
-from Helper import Helper
-from RoTK2 import RoTK2
+from Helper import Helper,Province,Officer,Ruler
 from Data import DelegateMode
 
 class Command4(object):
@@ -14,7 +13,7 @@ class Command4(object):
 
     def Start(self,province_no):
         self.province_no = province_no
-        self.province = RoTK2.GetProvinceBySequence(province_no)
+        self.province = Province.FromSequence(province_no)
 
         commands = [Helper.GetBuiltinText(0x6C66,0x6C69),Helper.GetBuiltinText(0x6C6E,0x6C71),Helper.GetBuiltinText(0x6C76,0x6C79)]
         Helper.ClearInputArea()
@@ -49,7 +48,7 @@ class Command4(object):
             return
 
         self.province.Gold -= soldiers_hired * 10
-        RoTK2.FlushProvince(self.province)
+        self.province.Flush()
 
         self.AdjustSoldiers(soldiers_hired)
 
@@ -65,7 +64,7 @@ class Command4(object):
         min_2 = min(int(self.province.Food/100), int(self.province.Gold/10))
 
         min_3 = 0
-        for officer in self.province.OfficerList:
+        for officer in self.province.GetOfficerList():
             min_3 += (10000 - officer.Soldiers)
         min_3 = int(min_3/100)
 
@@ -81,7 +80,7 @@ class Command4(object):
 
     def Training(self):
         isHighest = True
-        for officer_no in self.province.OfficerList:
+        for officer_no in self.province.GetOfficerList():
             if officer_no.TrainingLevel!=100:
                 isHighest = False
                 break
@@ -97,17 +96,17 @@ class Command4(object):
         officer = self.province.GetOfficerBySequence(officer_no)
 
         s = 0
-        for officer_no in self.province.OfficerList:
+        for officer_no in self.province.GetOfficerList():
             s += int(officer_no.Soldiers / 100)
 
         s2 = int(math.sqrt(s + 1))
         inc = int(officer.War * 2 / s2)
 
-        for officer in self.province.OfficerList:
+        for officer in self.province.GetOfficerList():
             officer.TrainingLevel += inc
             if officer.TrainingLevel>100:
                 officer.TrainingLevel = 100
-            RoTK2.FlushOfficer(officer)
+            officer.Flush()
 
         # after training
         Helper.ShowDelayedText(Helper.GetBuiltinText(0x6BB9),palette_no=3,top=330,clear_input_area=False)
@@ -121,25 +120,25 @@ class Command4(object):
             Helper.Screen.blit(img,(300*Helper.Scale,300*Helper.Scale))
             pygame.display.flip()
             # change who?
-            officer_no = Helper.SelectOfficer(self.province_no, Helper.GetBuiltinText(0x6C06),ShowOfficerFlag.Soldiers, row=1,clear_area=False)
+            officer_no = Helper.SelectOfficer(self.province_no, Helper.GetBuiltinText(0x6C06),ShowOfficerFlag.Soldiers, row=1,clear_area=False,check_can_action=False)
             if officer_no<1:
                 if soldiers_remained>0:
                     # soldiers transit to people?
                     yn = Helper.GetInput(Helper.GetBuiltinText(0x6C16).replace("%lu",str(soldiers_remained*100))+Helper.GetBuiltinText(0x3D7D)+"(Y/N)? ",yesno=True,row=2)
                     if yn=="y":
                         self.province.Population -= soldiers_remained*100
-                        RoTK2.FlushProvince(self.province)
+                        self.province.Flush()
 
                         return
                 else:
                     yn = Helper.GetInput(Helper.GetBuiltinText(0x3D7D) + "(Y/N)? ", yesno=True, row=2)
                     if yn=="y":
                         self.province.Population -= soldiers_hired * 100
-                        RoTK2.FlushProvince(self.province)
+                        self.province.Flush()
 
                         return
 
-            officer = RoTK2.GetOfficerByOffset(self.province.GetOfficerBySequence(officer_no).Offset)
+            officer = Officer.FromOffset(self.province.GetOfficerBySequence(officer_no).Offset)
             soldiers_remained += int(officer.Soldiers/100)
             max = soldiers_remained if soldiers_remained < 100 else 100
             # how many soldiers will be owner?

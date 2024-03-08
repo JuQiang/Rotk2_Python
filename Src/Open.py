@@ -1,7 +1,7 @@
 import pygame
 from Helper import Helper
 from Data import Data
-from Src.UI.DrawCGA import DrawCGA
+from DrawCGA import DrawCGA
 
 class Open(object):
     def __init__(self):
@@ -59,7 +59,7 @@ class Open(object):
         dc = DrawCGA(mappings, Data.OPENING[mappings[0]:mappings[0] + 0x4000], True)
         dc.Start()
 
-        img = self.DrawData(dc.display_buf, 7)
+        img = Helper.DrawData(dc.display_buf, 7)
         #pygame.image.save(img,"logo_"+keyname+".png")
         return pygame.transform.scale(img, (img.get_width() * Helper.Scale, img.get_height() * Helper.Scale))
 
@@ -133,7 +133,7 @@ class Open(object):
             if self.splash_index==1:
                 Helper.Screen.fill((0,0,0))
                 pygame.display.flip()
-                Helper.Screen.blit(splash,(0,0-150*Helper.Scale))
+                Helper.Screen.blit(splash,(0,0))#-150*Helper.Scale))
             elif self.splash_index==2:
                 splash = splash.subsurface(pygame.Rect(0,250*Helper.Scale,640*Helper.Scale,100*Helper.Scale))
                 Helper.Screen.blit(splash,(0,250*Helper.Scale))

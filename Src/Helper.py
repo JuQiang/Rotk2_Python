@@ -518,7 +518,7 @@ class Helper(object):
         pygame.display.flip()
 
     @staticmethod
-    def GetMap(color_map=False):
+    def GetMap(color_map=True):
         list = [Data.GrpdataMappings["MapTop"], Data.GrpdataMappings["MapBottom"],
                 Data.GrpdataMappings["MapHead"], ]
 

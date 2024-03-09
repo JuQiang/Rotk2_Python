@@ -11,4 +11,12 @@ Currently, the most perplexing part is the color rendering of images. I have rev
 
 The names of the folders are self-explanatory. In the Screenshot folder, you can find typical screenshots of the current game interface. In the IDA folder, you can find my comments for main.exe and open.exe. 
 
+## How to run or debug
 To run the program, simply right-click on main.py in PyCharm and select Run or Debug.
+
+## Important things
+* Maybe you need setup the interperter from pycharm settings.
+* You should install pygame module only.
+* Game data file located at subfolder Resource.
+* You could press ENTER when the splashscreen is showing , and select 2 to load an existing game data. You can load S0 or S1 or S2 or S3 or S4 or S5 or S6, of course, you can load any yourself game data file.
+
